@@ -32,8 +32,8 @@ async function loadData() {
                         unidadeSaude: (values[2] || '').trim(), // Coluna C
                         dataAgendamento: (values[3] || '').trim(), // Coluna D
                         horarioAgendamento: (values[4] || '').trim(), // Coluna E
-                        nomePaciente: (values[5] || '').trim(), // Coluna F
-                        telefone: (values[6] || '').trim(), // Coluna G
+                        nomePaciente: (values[5] || '').trim(), // Coluna F (usado internamente)
+                        telefone: (values[6] || '').trim(), // Coluna G (usado internamente)
                         prontuarioVivver: (values[7] || '').trim(), // Coluna H
                         observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
                         perfilPacienteExame: (values[9] || '').trim(), // Coluna J
@@ -390,14 +390,12 @@ function updateTable() {
     // Limpar o conteúdo anterior
     tableBody.innerHTML = '';
     
-    // Inserir os dados filtrados
+    // Inserir os dados filtrados (SEM as colunas Nome do Paciente e Telefone)
     tableBody.innerHTML = filteredData.map(item => `
         <tr>
             <td>${item.unidadeSaude || ''}</td>
             <td>${item.dataAgendamento || ''}</td>
             <td>${item.horarioAgendamento || ''}</td>
-            <td>${item.nomePaciente || ''}</td>
-            <td>${item.telefone || ''}</td>
             <td>${item.prontuarioVivver || ''}</td>
             <td>${item.observacaoUnidadeSaude || ''}</td>
             <td>${item.perfilPacienteExame || ''}</td>
@@ -415,7 +413,7 @@ function updateTable() {
         order: [[1, 'desc']],
         columnDefs: [
             { 
-                targets: [0, 6, 7, 8], // Colunas que podem ter texto longo
+                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo (ajustadas para nova numeração)
                 render: function(data, type, row) {
                     if (type === 'display' && data && data.length > 30) {
                         return `<span title="${data}">${data.substr(0, 30)}...</span>`;
@@ -568,12 +566,11 @@ function clearFilters() {
 }
 
 function exportToExcel() {
+    // Na exportação, incluir apenas as colunas visíveis (sem nome e telefone)
     const ws = XLSX.utils.json_to_sheet(filteredData.map(item => ({
         'UNIDADE DE SAÚDE': item.unidadeSaude || '',
         'DATA': item.dataAgendamento || '',
         'HORÁRIO': item.horarioAgendamento || '',
-        'NOME DO PACIENTE': item.nomePaciente || '',
-        'TELEFONE': item.telefone || '',
         'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
         'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
         'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
