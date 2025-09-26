@@ -30,7 +30,7 @@
         <div class="container mx-auto px-6 py-6">
             <div class="flex items-center mb-4">
                 <i class="fas fa-filter text-gray-600 mr-2"></i>
-                <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">23/09/2025</span></h3>
+                <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">26/09/2025</span></h3>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -101,7 +101,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Total de Vagas</p>
-                        <p class="text-3xl font-bold text-gray-900" id="totalVagas">1513</p>
+                        <p class="text-3xl font-bold text-gray-900" id="totalVagas">0</p>
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Vagas Livres</p>
-                        <p class="text-3xl font-bold text-gray-900" id="vagasLivres">1513</p>
+                        <p class="text-3xl font-bold text-gray-900" id="vagasLivres">0</p>
                     </div>
                 </div>
             </div>
@@ -193,10 +193,12 @@
                             <th>UNIDADE DE SAÚDE</th>
                             <th>DATA</th>
                             <th>HORÁRIO</th>
+                            <th>NOME DO PACIENTE</th>
+                            <th>TELEFONE</th>
                             <th>Nº PRONTUÁRIO VIVVER</th>
                             <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
                             <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
-                            <th>Laboratório de Coleta</th>
+                            <th>LABORATÓRIO DE COLETA</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -312,6 +314,117 @@
         </div>
     </div>
 
+    <!-- NOVAS TABELAS: Vagas Livres -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                <i class="fas fa-calendar-plus mr-2 text-indigo-500"></i>
+                Relatório de Vagas Livres
+            </h3>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            <!-- Tabela: Vagas Livres por Dia e Unidade -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h4 class="text-md font-semibold text-gray-800">
+                        <i class="fas fa-calendar-day mr-2 text-indigo-500"></i>
+                        Vagas Livres por Dia/Unidade
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="overflow-x-auto">
+                        <table id="tableVagasLivresDiaUnidade" class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2">Data/Unidade</th>
+                                    <th class="text-right py-2">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela: Vagas Livres por Mês e Unidade -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h4 class="text-md font-semibold text-gray-800">
+                        <i class="fas fa-calendar mr-2 text-teal-500"></i>
+                        Vagas Livres por Mês/Unidade
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="overflow-x-auto">
+                        <table id="tableVagasLivresMesUnidade" class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2">Mês/Unidade</th>
+                                    <th class="text-right py-2">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela: Vagas Livres por Dia e Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h4 class="text-md font-semibold text-gray-800">
+                        <i class="fas fa-flask mr-2 text-cyan-500"></i>
+                        Vagas Livres por Dia/Lab
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="overflow-x-auto">
+                        <table id="tableVagasLivresDiaLab" class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2">Data/Laboratório</th>
+                                    <th class="text-right py-2">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela: Vagas Livres por Mês e Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h4 class="text-md font-semibold text-gray-800">
+                        <i class="fas fa-vial mr-2 text-pink-500"></i>
+                        Vagas Livres por Mês/Lab
+                    </h4>
+                </div>
+                <div class="p-4">
+                    <div class="overflow-x-auto">
+                        <table id="tableVagasLivresMesLab" class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2">Mês/Laboratório</th>
+                                    <th class="text-right py-2">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bibliotecas de Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -324,5 +437,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
