@@ -1,9 +1,13 @@
-let allData = [];
-let filteredData = [];
-let charts = {};
-let dataTable;
+// URL da planilha publicada na web em formato CSV.
+// Esta URL é construída a partir do ID da sua planilha e do GID da aba.
+const SHEET_ID = '1Gtan6GhpDO5ViVuNMiT0AGm3F5I5iZSIYhWHVJ3ga6E';
+const SHEET_GID = '64540129';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
-const SHEET_URL ='https://docs.google.com/spreadsheets/d/1Gtan6GhpDO5ViVuNMiT0AGm3F5I5iZSIYhWHVJ3ga6E/edit?pli=1&gid=64540129#gid=64540129';
+let allData = []; // Armazena todos os dados brutos da planilha
+let filteredData = []; // Armazena os dados após a aplicação dos filtros
+let dataTable; // Objeto da tabela (DataTables )
+let charts = {}; // Objeto para armazenar as instâncias dos gráficos
 
 // Sample data for demonstration
 const sampleData = [
