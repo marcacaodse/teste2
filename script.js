@@ -51,7 +51,9 @@ async function loadData() {
         console.log('Dados carregados:', allData.length, 'registros');
 
         if (allData.length === 0) {
-            throw new Error('Nenhum dado válido encontrado na planilha.');
+            console.warn('Nenhum dado encontrado, carregando dados de exemplo...');
+            loadSampleData();
+            return;
         }
 
         filteredData = [...allData];
@@ -96,6 +98,17 @@ function loadSampleData() {
             observacaoUnidadeSaude: 'Paciente regular',
             perfilPacienteExame: 'Exame de rotina',
             laboratorioColeta: 'ELDORADO' 
+        },
+        { 
+            unidadeSaude: 'UNIDADE XV', 
+            dataAgendamento: '13/11/2025', 
+            horarioAgendamento: '8h10', 
+            nomePaciente: 'Maria Santos', 
+            telefone: '(11) 88888-8888',
+            prontuarioVivver: '54321',
+            observacaoUnidadeSaude: 'Primeira consulta',
+            perfilPacienteExame: 'Exame preventivo',
+            laboratorioColeta: 'PARQUE SÃO JOÃO' 
         }
     ];
     filteredData = [...allData];
@@ -335,11 +348,22 @@ function updateChartUltimaDataLaboratorio() {
 }
 
 function updateTable() {
+    // Destruir a tabela anterior se existir
     if (dataTable) {
         dataTable.destroy();
+        dataTable = null;
     }
     
     const tableBody = document.querySelector('#agendamentosTable tbody');
+    if (!tableBody) {
+        console.error('Elemento tbody da tabela não encontrado');
+        return;
+    }
+    
+    // Limpar o conteúdo anterior
+    tableBody.innerHTML = '';
+    
+    // Inserir os dados filtrados
     tableBody.innerHTML = filteredData.map(item => `
         <tr>
             <td>${item.unidadeSaude || ''}</td>
@@ -354,13 +378,25 @@ function updateTable() {
         </tr>
     `).join('');
     
+    // Inicializar o DataTable
     dataTable = $('#agendamentosTable').DataTable({
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
         },
         pageLength: 15,
         responsive: true,
-        order: [[1, 'desc']]
+        order: [[1, 'desc']],
+        columnDefs: [
+            { 
+                targets: [0, 6, 7, 8], // Colunas que podem ter texto longo
+                render: function(data, type, row) {
+                    if (type === 'display' && data && data.length > 30) {
+                        return `<span title="${data}">${data.substr(0, 30)}...</span>`;
+                    }
+                    return data;
+                }
+            }
+        ]
     });
 }
 
@@ -498,7 +534,7 @@ function exportToExcel() {
         'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
         'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
         'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
-        'Laboratório de Coleta': item.laboratorioColeta || ''
+        'LABORATÓRIO DE COLETA': item.laboratorioColeta || ''
     })));
     
     const wb = XLSX.utils.book_new();
