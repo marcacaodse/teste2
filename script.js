@@ -91,8 +91,6 @@ async function loadData() {
                                 if (cleanHeader === 'unidadedesaude') cleanHeader = 'unidadeSaude';
                                 if (cleanHeader === 'data') cleanHeader = 'dataAgendamento';
                                 if (cleanHeader === 'horario') cleanHeader = 'horarioAgendamento';
-                                if (cleanHeader === 'nomedopaciente') cleanHeader = 'nomePaciente';
-                                if (cleanHeader === 'telefone') cleanHeader = 'telefone';
                                 if (cleanHeader === 'nprontuariovivver') cleanHeader = 'prontuarioVivver';
                                 if (cleanHeader === 'observacaounidadedesaude') cleanHeader = 'observacaoUnidadeSaude';
                                 if (cleanHeader === 'perfildopacienteoutipodoexame') cleanHeader = 'perfilPacienteExame';
@@ -612,8 +610,6 @@ function updateTable() {
             <td>${item.unidadeSaude || ''}</td>
             <td>${item.dataAgendamento || ''}</td>
             <td>${item.horarioAgendamento || ''}</td>
-            <td>${item.nomePaciente || ''}</td>
-            <td>${item.telefone || ''}</td>
             <td>${item.prontuarioVivver || ''}</td>
             <td>${item.observacaoUnidadeSaude || ''}</td>
             <td>${item.perfilPacienteExame || ''}</td>
@@ -648,8 +644,6 @@ function exportToExcel() {
         'UNIDADE DE SAÚDE': item.unidadeSaude || '',
         'DATA': item.dataAgendamento || '',
         'HORÁRIO': item.horarioAgendamento || '',
-        'NOME DO PACIENTE': item.nomePaciente || '',
-        'TELEFONE': item.telefone || '',
         'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
         'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
         'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
