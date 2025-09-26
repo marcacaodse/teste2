@@ -6,6 +6,15 @@ let dataTable;
 // URL corrigida para acessar a planilha como CSV
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Gtan6GhpDO5ViVuNMiT0AGm3F5I5iZSIYhWHVJ3ga6E/export?format=csv&gid=64540129';
 
+// Unidades de Saúde predefinidas
+const UNIDADES_SAUDE = [
+    'Agua Branca', 'Jardim Bandeirantes', 'Unidade XV', 'Csu Eldorado', 
+    'Novo Eldorado', 'Jardim Eldorado', 'Santa Cruz', 'Perobas', 'Parque São João'
+];
+
+// Laboratórios de Coleta predefinidos
+const LABORATORIOS_COLETA = ['Eldorado', 'Agua Branca', 'Parque São João'];
+
 async function loadData() {
     try {
         document.getElementById('connectionStatus').className = 'status-indicator status-online';
@@ -29,19 +38,19 @@ async function loadData() {
                 // As colunas de interesse são C a K (índices 2 a 10)
                 if (values.length >= 11) {
                     let row = {
-                        unidadeSaude: (values[2] || '').trim(), // Coluna C
+                        unidadeSaude: normalizeUnidadeSaude((values[2] || '').trim()), // Coluna C
                         dataAgendamento: (values[3] || '').trim(), // Coluna D
                         horarioAgendamento: (values[4] || '').trim(), // Coluna E
-                        nomePaciente: (values[5] || '').trim(), // Coluna F (usado internamente)
-                        telefone: (values[6] || '').trim(), // Coluna G (usado internamente)
+                        nomePaciente: (values[5] || '').trim(), // Coluna F
+                        telefone: (values[6] || '').trim(), // Coluna G
                         prontuarioVivver: (values[7] || '').trim(), // Coluna H
                         observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
                         perfilPacienteExame: (values[9] || '').trim(), // Coluna J
-                        laboratorioColeta: (values[10] || '').trim() // Coluna K
+                        laboratorioColeta: normalizeLaboratorio((values[10] || '').trim()) // Coluna K
                     };
 
-                    // Só adiciona se tiver pelo menos unidade de saúde ou data
-                    if (row.unidadeSaude !== '' || row.dataAgendamento !== '') {
+                    // Só adiciona se tiver pelo menos unidade de saúde E data válida
+                    if (row.unidadeSaude !== '' && row.dataAgendamento !== '' && isValidDate(row.dataAgendamento)) {
                         allData.push(row);
                     }
                 }
@@ -55,6 +64,13 @@ async function loadData() {
             loadSampleData();
             return;
         }
+
+        // Filtrar dados a partir de 01/11/2025
+        const dataMinima = new Date('2025-11-01');
+        allData = allData.filter(item => {
+            const dataItem = parseDate(item.dataAgendamento);
+            return dataItem && dataItem >= dataMinima;
+        });
 
         filteredData = [...allData];
         updateFilters();
@@ -74,52 +90,76 @@ async function loadData() {
     }
 }
 
+function normalizeUnidadeSaude(unidade) {
+    if (!unidade) return '';
+    const upper = unidade.toUpperCase();
+    
+    // Mapeamento para normalizar variações dos nomes
+    if (upper.includes('AGUA BRANCA')) return 'Agua Branca';
+    if (upper.includes('JARDIM BANDEIRANTES')) return 'Jardim Bandeirantes';
+    if (upper.includes('UNIDADE XV')) return 'Unidade XV';
+    if (upper.includes('CSU ELDORADO')) return 'Csu Eldorado';
+    if (upper.includes('NOVO ELDORADO')) return 'Novo Eldorado';
+    if (upper.includes('JARDIM ELDORADO')) return 'Jardim Eldorado';
+    if (upper.includes('SANTA CRUZ')) return 'Santa Cruz';
+    if (upper.includes('PEROBAS')) return 'Perobas';
+    if (upper.includes('PARQUE SAO JOAO') || upper.includes('PARQUE SÃO JOÃO')) return 'Parque São João';
+    
+    return unidade;
+}
+
+function normalizeLaboratorio(lab) {
+    if (!lab) return '';
+    const upper = lab.toUpperCase();
+    
+    if (upper.includes('ELDORADO')) return 'Eldorado';
+    if (upper.includes('AGUA BRANCA')) return 'Agua Branca';
+    if (upper.includes('PARQUE SAO JOAO') || upper.includes('PARQUE SÃO JOÃO')) return 'Parque São João';
+    
+    return lab;
+}
+
+function isValidDate(dateStr) {
+    if (!dateStr) return false;
+    const date = parseDate(dateStr);
+    return date && !isNaN(date.getTime());
+}
+
 function loadSampleData() {
-    // Dados de exemplo baseados na estrutura real da planilha
+    // Dados de exemplo com agendamentos futuros a partir de 01/11/2025
     allData = [
         { 
             unidadeSaude: 'Agua Branca', 
             dataAgendamento: '11/11/2025', 
             horarioAgendamento: '8h10', 
-            nomePaciente: '', 
-            telefone: '',
-            prontuarioVivver: '',
-            observacaoUnidadeSaude: 'Preencher',
-            perfilPacienteExame: 'Preencher',
+            nomePaciente: 'João Silva', 
+            telefone: '(11) 99999-9999',
+            prontuarioVivver: '12345',
+            observacaoUnidadeSaude: 'Paciente regular',
+            perfilPacienteExame: 'Exame de rotina',
             laboratorioColeta: 'Agua Branca' 
         },
         { 
             unidadeSaude: 'Jardim Bandeirantes', 
             dataAgendamento: '12/11/2025', 
             horarioAgendamento: '7h10', 
-            nomePaciente: 'João Silva', 
-            telefone: '(11) 99999-9999',
-            prontuarioVivver: '12345',
-            observacaoUnidadeSaude: 'Paciente regular',
-            perfilPacienteExame: 'Exame de rotina',
-            laboratorioColeta: 'Eldorado' 
-        },
-        { 
-            unidadeSaude: 'Unidade XV', 
-            dataAgendamento: '13/11/2025', 
-            horarioAgendamento: '8h10', 
             nomePaciente: 'Maria Santos', 
             telefone: '(11) 88888-8888',
             prontuarioVivver: '54321',
             observacaoUnidadeSaude: 'Primeira consulta',
             perfilPacienteExame: 'Exame preventivo',
-            laboratorioColeta: 'Parque São João' 
+            laboratorioColeta: 'Eldorado' 
         },
         { 
-            unidadeSaude: 'Csu Eldorado', 
-            dataAgendamento: '14/11/2025', 
-            horarioAgendamento: '9h00', 
+            unidadeSaude: 'Unidade XV', 
+            dataAgendamento: '25/12/2025', 
+            horarioAgendamento: '8h10', 
             nomePaciente: '', 
             telefone: '',
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Eldorado' 
+            laboratorioColeta: 'Parque São João' 
         }
     ];
     filteredData = [...allData];
@@ -138,26 +178,17 @@ function parseCSVLine(line) {
         if (char === '"') {
             inQuotes = !inQuotes;
         } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
+            result.push(current.trim().replace(/^"|"$/g, ''));
             current = '';
         } else {
             current += char;
         }
     }
-    result.push(current.trim());
+    result.push(current.trim().replace(/^"|"$/g, ''));
     return result;
 }
 
 function updateFilters() {
-    // Unidades de Saúde predefinidas conforme especificado
-    const unidadesSaude = [
-        'Agua Branca', 'Jardim Bandeirantes', 'Unidade XV', 'Csu Eldorado', 
-        'Novo Eldorado', 'Jardim Eldorado', 'Santa Cruz', 'Perobas', 'Parque São João'
-    ];
-    
-    // Laboratórios de Coleta predefinidos
-    const laboratoriosColeta = ['Eldorado', 'Agua Branca', 'Parque São João'];
-    
     // Horários únicos dos dados
     const horariosSet = new Set();
     allData.forEach(item => {
@@ -166,9 +197,9 @@ function updateFilters() {
         }
     });
 
-    updateSelectOptions('unidadeSaudeFilter', unidadesSaude);
+    updateSelectOptions('unidadeSaudeFilter', UNIDADES_SAUDE);
     updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
-    updateSelectOptions('laboratorioColetaFilter', laboratoriosColeta);
+    updateSelectOptions('laboratorioColetaFilter', LABORATORIOS_COLETA);
 
     // Reinicializar Select2
     $('.filter-select').select2({
@@ -225,9 +256,13 @@ function parseDate(dateStr) {
 }
 
 function updateStats() {
-    const totalVagas = allData.length;
+    const totalVagas = filteredData.length;
     // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
-    const vagasOcupadas = allData.filter(item => item.nomePaciente && item.nomePaciente.trim() !== '' && item.nomePaciente.trim().toLowerCase() !== 'preencher').length;
+    const vagasOcupadas = filteredData.filter(item => 
+        item.nomePaciente && 
+        item.nomePaciente.trim() !== '' && 
+        item.nomePaciente.trim().toLowerCase() !== 'preencher'
+    ).length;
     const vagasLivres = totalVagas - vagasOcupadas;
     const taxaOcupacao = totalVagas > 0 ? (vagasOcupadas / totalVagas * 100).toFixed(1) + '%' : '0.0%';
 
@@ -246,34 +281,42 @@ function updateDashboard() {
 }
 
 function updateCharts() {
-    updateChartUltimaDataUnidade();
-    updateChartUltimaDataLaboratorio();
+    updateChartProximosAgendamentosUnidade();
+    updateChartProximosAgendamentosLaboratorio();
 }
 
-function updateChartUltimaDataUnidade() {
-    const lastDateByUnidade = {};
+function updateChartProximosAgendamentosUnidade() {
+    const proximosAgendamentosPorUnidade = {};
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
     
-    // Filtra apenas os registros que têm nome do paciente preenchido (coluna F)
-    const agendamentosOcupados = filteredData.filter(item => 
-        item.nomePaciente && 
-        item.nomePaciente.trim() !== '' && 
-        item.nomePaciente.trim().toLowerCase() !== 'preencher'
-    );
-    
-    agendamentosOcupados.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude) {
-            const date = parseDate(item.dataAgendamento);
-            if (date) {
-                if (!lastDateByUnidade[item.unidadeSaude] || date > lastDateByUnidade[item.unidadeSaude]) {
-                    lastDateByUnidade[item.unidadeSaude] = date;
-                }
+    // Para cada unidade, encontrar o próximo agendamento disponível (vaga livre)
+    UNIDADES_SAUDE.forEach(unidade => {
+        const vagasLivresUnidade = filteredData.filter(item => 
+            item.unidadeSaude === unidade &&
+            (!item.nomePaciente || 
+             item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')
+        );
+        
+        if (vagasLivresUnidade.length > 0) {
+            // Encontrar a data mais próxima no futuro
+            const datasOrdenadas = vagasLivresUnidade
+                .map(item => parseDate(item.dataAgendamento))
+                .filter(date => date && date >= hoje)
+                .sort((a, b) => a - b);
+            
+            if (datasOrdenadas.length > 0) {
+                const proximaData = datasOrdenadas[0];
+                const diasAteProximoAgendamento = Math.ceil((proximaData - hoje) / (1000 * 60 * 60 * 24));
+                proximosAgendamentosPorUnidade[unidade] = diasAteProximoAgendamento;
             }
         }
     });
 
-    const sortedData = Object.entries(lastDateByUnidade)
-        .map(([unidade, date]) => [unidade, date])
-        .sort((a, b) => b[1] - a[1]);
+    const dadosOrdenados = Object.entries(proximosAgendamentosPorUnidade)
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 10); // Limitar a 10 unidades
 
     const ctx = document.getElementById('chartUltimaDataUnidade').getContext('2d');
     if (charts.ultimaDataUnidade) charts.ultimaDataUnidade.destroy();
@@ -281,10 +324,10 @@ function updateChartUltimaDataUnidade() {
     charts.ultimaDataUnidade = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: sortedData.map(item => item[0]),
+            labels: dadosOrdenados.map(item => item[0]),
             datasets: [{
-                label: 'Última Data de Agendamento',
-                data: sortedData.map(item => item[1]),
+                label: 'Dias até próximo agendamento',
+                data: dadosOrdenados.map(item => item[1]),
                 backgroundColor: '#dc2626',
                 borderColor: '#b91c1c',
                 borderWidth: 1
@@ -301,41 +344,60 @@ function updateChartUltimaDataUnidade() {
                     font: { weight: 'bold', size: 12 },
                     anchor: 'center',
                     align: 'center',
-                    formatter: (value) => value.toLocaleDateString('pt-BR')
+                    formatter: (value) => `${value} dias`
                 }
             },
             scales: {
-                x: { display: false },
-                y: { beginAtZero: true }
+                x: { 
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Dias até próximo agendamento'
+                    }
+                },
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Unidades de Saúde'
+                    }
+                }
             }
         }
     });
 }
 
-function updateChartUltimaDataLaboratorio() {
-    const lastDateByLab = {};
+function updateChartProximosAgendamentosLaboratorio() {
+    const proximosAgendamentosPorLab = {};
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
     
-    // Filtra apenas os registros que têm nome do paciente preenchido (coluna F)
-    const agendamentosOcupados = filteredData.filter(item => 
-        item.nomePaciente && 
-        item.nomePaciente.trim() !== '' && 
-        item.nomePaciente.trim().toLowerCase() !== 'preencher'
-    );
-    
-    agendamentosOcupados.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta) {
-            const date = parseDate(item.dataAgendamento);
-            if (date) {
-                if (!lastDateByLab[item.laboratorioColeta] || date > lastDateByLab[item.laboratorioColeta]) {
-                    lastDateByLab[item.laboratorioColeta] = date;
-                }
+    // Para cada laboratório, encontrar o próximo agendamento disponível (vaga livre)
+    LABORATORIOS_COLETA.forEach(lab => {
+        const vagasLivresLab = filteredData.filter(item => 
+            item.laboratorioColeta === lab &&
+            (!item.nomePaciente || 
+             item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')
+        );
+        
+        if (vagasLivresLab.length > 0) {
+            // Encontrar a data mais próxima no futuro
+            const datasOrdenadas = vagasLivresLab
+                .map(item => parseDate(item.dataAgendamento))
+                .filter(date => date && date >= hoje)
+                .sort((a, b) => a - b);
+            
+            if (datasOrdenadas.length > 0) {
+                const proximaData = datasOrdenadas[0];
+                const diasAteProximoAgendamento = Math.ceil((proximaData - hoje) / (1000 * 60 * 60 * 24));
+                proximosAgendamentosPorLab[lab] = diasAteProximoAgendamento;
             }
         }
     });
 
-    const sortedData = Object.entries(lastDateByLab)
-        .map(([lab, date]) => [lab, date])
-        .sort((a, b) => b[1] - a[1]);
+    const dadosOrdenados = Object.entries(proximosAgendamentosPorLab)
+        .sort((a, b) => a[1] - b[1]);
 
     const ctx = document.getElementById('chartUltimaDataLaboratorio').getContext('2d');
     if (charts.ultimaDataLaboratorio) charts.ultimaDataLaboratorio.destroy();
@@ -343,10 +405,10 @@ function updateChartUltimaDataLaboratorio() {
     charts.ultimaDataLaboratorio = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: sortedData.map(item => item[0]),
+            labels: dadosOrdenados.map(item => item[0]),
             datasets: [{
-                label: 'Última Data de Agendamento',
-                data: sortedData.map(item => item[1]),
+                label: 'Dias até próximo agendamento',
+                data: dadosOrdenados.map(item => item[1]),
                 backgroundColor: '#ea580c',
                 borderColor: '#f97316',
                 borderWidth: 1
@@ -363,12 +425,24 @@ function updateChartUltimaDataLaboratorio() {
                     font: { weight: 'bold', size: 12 },
                     anchor: 'center',
                     align: 'center',
-                    formatter: (value) => value.toLocaleDateString('pt-BR')
+                    formatter: (value) => `${value} dias`
                 }
             },
             scales: {
-                x: { display: false },
-                y: { beginAtZero: true }
+                x: { 
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Dias até próximo agendamento'
+                    }
+                },
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Laboratórios de Coleta'
+                    }
+                }
             }
         }
     });
@@ -410,10 +484,10 @@ function updateTable() {
         },
         pageLength: 15,
         responsive: true,
-        order: [[1, 'desc']],
+        order: [[1, 'asc']], // Ordenar por data
         columnDefs: [
             { 
-                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo (ajustadas para nova numeração)
+                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo
                 render: function(data, type, row) {
                     if (type === 'display' && data && data.length > 30) {
                         return `<span title="${data}">${data.substr(0, 30)}...</span>`;
@@ -426,9 +500,9 @@ function updateTable() {
 }
 
 function updateSummaryTables() {
-    // Pacientes por Dia/Unidade (apenas com nome preenchido)
+    // Pacientes por Dia/Unidade (apenas com nome preenchido) - TODOS OS DADOS
     const dayUnidadeCount = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -436,11 +510,11 @@ function updateSummaryTables() {
             dayUnidadeCount[key] = (dayUnidadeCount[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tablePacientesDiaUnidade', Object.entries(dayUnidadeCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tablePacientesDiaUnidade', Object.entries(dayUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Unidade (apenas com nome preenchido)
+    // Pacientes por Mês/Unidade (apenas com nome preenchido) - TODOS OS DADOS
     const monthUnidadeCount = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -452,11 +526,11 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tablePacientesMesUnidade', Object.entries(monthUnidadeCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tablePacientesMesUnidade', Object.entries(monthUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Dia/Laboratório (apenas com nome preenchido)
+    // Pacientes por Dia/Laboratório (apenas com nome preenchido) - TODOS OS DADOS
     const dayLabCount = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -464,11 +538,11 @@ function updateSummaryTables() {
             dayLabCount[key] = (dayLabCount[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tablePacientesDiaLab', Object.entries(dayLabCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tablePacientesDiaLab', Object.entries(dayLabCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Laboratório (apenas com nome preenchido)
+    // Pacientes por Mês/Laboratório (apenas com nome preenchido) - TODOS OS DADOS
     const monthLabCount = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -480,12 +554,12 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tablePacientesMesLab', Object.entries(monthLabCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tablePacientesMesLab', Object.entries(monthLabCount).sort((a, b) => b[1] - a[1]));
 
-    // NOVAS TABELAS - Vagas Livres (sem nome preenchido ou com "Preencher")
+    // TABELAS DE VAGAS LIVRES - TODOS OS DADOS
     // Vagas Livres por Dia/Unidade
     const vagasLivresDiaUnidade = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -493,11 +567,11 @@ function updateSummaryTables() {
             vagasLivresDiaUnidade[key] = (vagasLivresDiaUnidade[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tableVagasLivresDiaUnidade', Object.entries(vagasLivresDiaUnidade).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tableVagasLivresDiaUnidade', Object.entries(vagasLivresDiaUnidade).sort((a, b) => b[1] - a[1]));
 
     // Vagas Livres por Mês/Unidade
     const vagasLivresMesUnidade = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -509,11 +583,11 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tableVagasLivresMesUnidade', Object.entries(vagasLivresMesUnidade).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tableVagasLivresMesUnidade', Object.entries(vagasLivresMesUnidade).sort((a, b) => b[1] - a[1]));
 
     // Vagas Livres por Dia/Laboratório
     const vagasLivresDiaLab = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -521,11 +595,11 @@ function updateSummaryTables() {
             vagasLivresDiaLab[key] = (vagasLivresDiaLab[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tableVagasLivresDiaLab', Object.entries(vagasLivresDiaLab).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tableVagasLivresDiaLab', Object.entries(vagasLivresDiaLab).sort((a, b) => b[1] - a[1]));
 
     // Vagas Livres por Mês/Laboratório
     const vagasLivresMesLab = {};
-    filteredData.forEach(item => {
+    allData.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -537,7 +611,7 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]).slice(0, 10));
+    updateSummaryTable('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
 }
 
 function updateSummaryTable(tableId, data) {
@@ -584,6 +658,9 @@ function exportToExcel() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Definir data mínima para o filtro de data como 01/11/2025
+    document.getElementById('dataFilter').min = '2025-11-01';
+    
     loadData();
     setInterval(loadData, 300000); // Auto-atualização a cada 5 minutos
 });
