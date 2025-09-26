@@ -29,15 +29,15 @@ async function loadData() {
                 // As colunas de interesse são C a K (índices 2 a 10)
                 if (values.length >= 11) {
                     let row = {
-                        unidadeSaude: (values[2] || '').trim(),
-                        dataAgendamento: (values[3] || '').trim(),
-                        horarioAgendamento: (values[4] || '').trim(),
-                        nomePaciente: (values[5] || '').trim(),
-                        telefone: (values[6] || '').trim(),
-                        prontuarioVivver: (values[7] || '').trim(),
-                        observacaoUnidadeSaude: (values[8] || '').trim(),
-                        perfilPacienteExame: (values[9] || '').trim(),
-                        laboratorioColeta: (values[10] || '').trim()
+                        unidadeSaude: (values[2] || '').trim(), // Coluna C
+                        dataAgendamento: (values[3] || '').trim(), // Coluna D
+                        horarioAgendamento: (values[4] || '').trim(), // Coluna E
+                        nomePaciente: (values[5] || '').trim(), // Coluna F
+                        telefone: (values[6] || '').trim(), // Coluna G
+                        prontuarioVivver: (values[7] || '').trim(), // Coluna H
+                        observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
+                        perfilPacienteExame: (values[9] || '').trim(), // Coluna J
+                        laboratorioColeta: (values[10] || '').trim() // Coluna K
                     };
 
                     // Só adiciona se tiver pelo menos unidade de saúde ou data
@@ -78,7 +78,7 @@ function loadSampleData() {
     // Dados de exemplo baseados na estrutura real da planilha
     allData = [
         { 
-            unidadeSaude: 'AGUA BRANCA', 
+            unidadeSaude: 'Agua Branca', 
             dataAgendamento: '11/11/2025', 
             horarioAgendamento: '8h10', 
             nomePaciente: '', 
@@ -86,10 +86,10 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'AGUA BRANCA' 
+            laboratorioColeta: 'Agua Branca' 
         },
         { 
-            unidadeSaude: 'JARDIM BANDEIRANTES', 
+            unidadeSaude: 'Jardim Bandeirantes', 
             dataAgendamento: '12/11/2025', 
             horarioAgendamento: '7h10', 
             nomePaciente: 'João Silva', 
@@ -97,10 +97,10 @@ function loadSampleData() {
             prontuarioVivver: '12345',
             observacaoUnidadeSaude: 'Paciente regular',
             perfilPacienteExame: 'Exame de rotina',
-            laboratorioColeta: 'ELDORADO' 
+            laboratorioColeta: 'Eldorado' 
         },
         { 
-            unidadeSaude: 'UNIDADE XV', 
+            unidadeSaude: 'Unidade XV', 
             dataAgendamento: '13/11/2025', 
             horarioAgendamento: '8h10', 
             nomePaciente: 'Maria Santos', 
@@ -108,7 +108,18 @@ function loadSampleData() {
             prontuarioVivver: '54321',
             observacaoUnidadeSaude: 'Primeira consulta',
             perfilPacienteExame: 'Exame preventivo',
-            laboratorioColeta: 'PARQUE SÃO JOÃO' 
+            laboratorioColeta: 'Parque São João' 
+        },
+        { 
+            unidadeSaude: 'Csu Eldorado', 
+            dataAgendamento: '14/11/2025', 
+            horarioAgendamento: '9h00', 
+            nomePaciente: '', 
+            telefone: '',
+            prontuarioVivver: '',
+            observacaoUnidadeSaude: 'Preencher',
+            perfilPacienteExame: 'Preencher',
+            laboratorioColeta: 'Eldorado' 
         }
     ];
     filteredData = [...allData];
@@ -140,12 +151,12 @@ function parseCSVLine(line) {
 function updateFilters() {
     // Unidades de Saúde predefinidas conforme especificado
     const unidadesSaude = [
-        'AGUA BRANCA', 'JARDIM BANDEIRANTES', 'UNIDADE XV', 'CSU ELDORADO', 
-        'NOVO ELDORADO', 'JARDIM ELDORADO', 'SANTA CRUZ', 'PEROBAS', 'PARQUE SÃO JOÃO'
+        'Agua Branca', 'Jardim Bandeirantes', 'Unidade XV', 'Csu Eldorado', 
+        'Novo Eldorado', 'Jardim Eldorado', 'Santa Cruz', 'Perobas', 'Parque São João'
     ];
     
     // Laboratórios de Coleta predefinidos
-    const laboratoriosColeta = ['ELDORADO', 'AGUA BRANCA', 'PARQUE SÃO JOÃO'];
+    const laboratoriosColeta = ['Eldorado', 'Agua Branca', 'Parque São João'];
     
     // Horários únicos dos dados
     const horariosSet = new Set();
@@ -215,8 +226,8 @@ function parseDate(dateStr) {
 
 function updateStats() {
     const totalVagas = allData.length;
-    // Vagas ocupadas são aquelas que têm nome do paciente preenchido
-    const vagasOcupadas = allData.filter(item => item.nomePaciente && item.nomePaciente.trim() !== '').length;
+    // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
+    const vagasOcupadas = allData.filter(item => item.nomePaciente && item.nomePaciente.trim() !== '' && item.nomePaciente.trim().toLowerCase() !== 'preencher').length;
     const vagasLivres = totalVagas - vagasOcupadas;
     const taxaOcupacao = totalVagas > 0 ? (vagasOcupadas / totalVagas * 100).toFixed(1) + '%' : '0.0%';
 
@@ -241,7 +252,15 @@ function updateCharts() {
 
 function updateChartUltimaDataUnidade() {
     const lastDateByUnidade = {};
-    filteredData.forEach(item => {
+    
+    // Filtra apenas os registros que têm nome do paciente preenchido (coluna F)
+    const agendamentosOcupados = filteredData.filter(item => 
+        item.nomePaciente && 
+        item.nomePaciente.trim() !== '' && 
+        item.nomePaciente.trim().toLowerCase() !== 'preencher'
+    );
+    
+    agendamentosOcupados.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
@@ -295,7 +314,15 @@ function updateChartUltimaDataUnidade() {
 
 function updateChartUltimaDataLaboratorio() {
     const lastDateByLab = {};
-    filteredData.forEach(item => {
+    
+    // Filtra apenas os registros que têm nome do paciente preenchido (coluna F)
+    const agendamentosOcupados = filteredData.filter(item => 
+        item.nomePaciente && 
+        item.nomePaciente.trim() !== '' && 
+        item.nomePaciente.trim().toLowerCase() !== 'preencher'
+    );
+    
+    agendamentosOcupados.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
@@ -401,20 +428,24 @@ function updateTable() {
 }
 
 function updateSummaryTables() {
-    // Pacientes por Dia/Unidade
+    // Pacientes por Dia/Unidade (apenas com nome preenchido)
     const dayUnidadeCount = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.unidadeSaude && 
+            item.nomePaciente && item.nomePaciente.trim() !== '' && 
+            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
             const key = `${item.dataAgendamento} - ${item.unidadeSaude}`;
             dayUnidadeCount[key] = (dayUnidadeCount[key] || 0) + 1;
         }
     });
     updateSummaryTable('tablePacientesDiaUnidade', Object.entries(dayUnidadeCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
 
-    // Pacientes por Mês/Unidade
+    // Pacientes por Mês/Unidade (apenas com nome preenchido)
     const monthUnidadeCount = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.unidadeSaude && 
+            item.nomePaciente && item.nomePaciente.trim() !== '' && 
+            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -425,20 +456,24 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesUnidade', Object.entries(monthUnidadeCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
 
-    // Pacientes por Dia/Laboratório
+    // Pacientes por Dia/Laboratório (apenas com nome preenchido)
     const dayLabCount = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.laboratorioColeta && 
+            item.nomePaciente && item.nomePaciente.trim() !== '' && 
+            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
             const key = `${item.dataAgendamento} - ${item.laboratorioColeta}`;
             dayLabCount[key] = (dayLabCount[key] || 0) + 1;
         }
     });
     updateSummaryTable('tablePacientesDiaLab', Object.entries(dayLabCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
 
-    // Pacientes por Mês/Laboratório
+    // Pacientes por Mês/Laboratório (apenas com nome preenchido)
     const monthLabCount = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.laboratorioColeta && 
+            item.nomePaciente && item.nomePaciente.trim() !== '' && 
+            item.nomePaciente.trim().toLowerCase() !== 'preencher') {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -449,11 +484,13 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesLab', Object.entries(monthLabCount).sort((a, b) => b[1] - a[1]).slice(0, 10));
 
-    // NOVAS TABELAS - Vagas Livres
+    // NOVAS TABELAS - Vagas Livres (sem nome preenchido ou com "Preencher")
     // Vagas Livres por Dia/Unidade
     const vagasLivresDiaUnidade = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && !item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.unidadeSaude && 
+            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
             const key = `${item.dataAgendamento} - ${item.unidadeSaude}`;
             vagasLivresDiaUnidade[key] = (vagasLivresDiaUnidade[key] || 0) + 1;
         }
@@ -463,7 +500,9 @@ function updateSummaryTables() {
     // Vagas Livres por Mês/Unidade
     const vagasLivresMesUnidade = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.unidadeSaude && !item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.unidadeSaude && 
+            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -477,7 +516,9 @@ function updateSummaryTables() {
     // Vagas Livres por Dia/Laboratório
     const vagasLivresDiaLab = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && !item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.laboratorioColeta && 
+            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
             const key = `${item.dataAgendamento} - ${item.laboratorioColeta}`;
             vagasLivresDiaLab[key] = (vagasLivresDiaLab[key] || 0) + 1;
         }
@@ -487,7 +528,9 @@ function updateSummaryTables() {
     // Vagas Livres por Mês/Laboratório
     const vagasLivresMesLab = {};
     filteredData.forEach(item => {
-        if (item.dataAgendamento && item.laboratorioColeta && !item.nomePaciente.trim()) {
+        if (item.dataAgendamento && item.laboratorioColeta && 
+            (!item.nomePaciente || item.nomePaciente.trim() === '' || 
+             item.nomePaciente.trim().toLowerCase() === 'preencher')) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
