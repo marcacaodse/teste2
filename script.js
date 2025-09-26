@@ -15,6 +15,19 @@ const UNIDADES_SAUDE = [
 // Laboratórios de Coleta predefinidos
 const LABORATORIOS_COLETA = ['Eldorado', 'Agua Branca', 'Parque São João'];
 
+// Mapeamento de Laboratórios por Unidade de Saúde (CORRIGIDO)
+const LABORATORIO_POR_UNIDADE = {
+    'Agua Branca': 'Agua Branca',
+    'Jardim Bandeirantes': 'Agua Branca',
+    'Perobas': 'Parque São João',
+    'Parque São João': 'Parque São João',
+    'Csu Eldorado': 'Eldorado',
+    'Unidade XV': 'Eldorado',
+    'Novo Eldorado': 'Eldorado',
+    'Jardim Eldorado': 'Eldorado',
+    'Santa Cruz': 'Eldorado'
+};
+
 async function loadData() {
     try {
         document.getElementById('connectionStatus').className = 'status-indicator status-online';
@@ -46,8 +59,16 @@ async function loadData() {
                         prontuarioVivver: (values[7] || '').trim(), // Coluna H
                         observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
                         perfilPacienteExame: (values[9] || '').trim(), // Coluna J
-                        laboratorioColeta: normalizeLaboratorio((values[10] || '').trim()) // Coluna K
+                        laboratorioColeta: '' // Será definido abaixo
                     };
+
+                    // CORREÇÃO: Definir laboratório de coleta baseado na unidade de saúde
+                    if (row.unidadeSaude && LABORATORIO_POR_UNIDADE[row.unidadeSaude]) {
+                        row.laboratorioColeta = LABORATORIO_POR_UNIDADE[row.unidadeSaude];
+                    } else {
+                        // Fallback para o valor da coluna K se existir
+                        row.laboratorioColeta = normalizeLaboratorio((values[10] || '').trim());
+                    }
 
                     // Só adiciona se tiver pelo menos unidade de saúde E data válida
                     if (row.unidadeSaude !== '' && row.dataAgendamento !== '' && isValidDate(row.dataAgendamento)) {
@@ -126,7 +147,7 @@ function isValidDate(dateStr) {
 }
 
 function loadSampleData() {
-    // Dados de exemplo com agendamentos futuros a partir de 01/11/2025
+    // Dados de exemplo com mapeamento correto dos laboratórios
     allData = [
         { 
             unidadeSaude: 'Agua Branca', 
@@ -148,10 +169,10 @@ function loadSampleData() {
             prontuarioVivver: '54321',
             observacaoUnidadeSaude: 'Primeira consulta',
             perfilPacienteExame: 'Exame preventivo',
-            laboratorioColeta: 'Eldorado' 
+            laboratorioColeta: 'Agua Branca' // Corrigido - Jardim Bandeirantes usa Agua Branca
         },
         { 
-            unidadeSaude: 'Unidade XV', 
+            unidadeSaude: 'Csu Eldorado', 
             dataAgendamento: '25/12/2025', 
             horarioAgendamento: '8h10', 
             nomePaciente: '', 
@@ -159,7 +180,18 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Parque São João' 
+            laboratorioColeta: 'Eldorado' // Corrigido - Csu Eldorado usa Eldorado
+        },
+        { 
+            unidadeSaude: 'Perobas', 
+            dataAgendamento: '15/12/2025', 
+            horarioAgendamento: '7h10', 
+            nomePaciente: '', 
+            telefone: '',
+            prontuarioVivver: '',
+            observacaoUnidadeSaude: 'Preencher',
+            perfilPacienteExame: 'Preencher',
+            laboratorioColeta: 'Parque São João' // Corrigido - Perobas usa Parque São João
         }
     ];
     filteredData = [...allData];
@@ -285,6 +317,7 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
 }
 
+// CORREÇÃO: Lógica dos gráficos para mostrar dias até próximo agendamento
 function updateChartProximosAgendamentosUnidade() {
     const proximosAgendamentosPorUnidade = {};
     const hoje = new Date();
@@ -292,7 +325,7 @@ function updateChartProximosAgendamentosUnidade() {
     
     // Para cada unidade, encontrar o próximo agendamento disponível (vaga livre)
     UNIDADES_SAUDE.forEach(unidade => {
-        const vagasLivresUnidade = filteredData.filter(item => 
+        const vagasLivresUnidade = allData.filter(item => 
             item.unidadeSaude === unidade &&
             (!item.nomePaciente || 
              item.nomePaciente.trim() === '' || 
@@ -374,7 +407,7 @@ function updateChartProximosAgendamentosLaboratorio() {
     
     // Para cada laboratório, encontrar o próximo agendamento disponível (vaga livre)
     LABORATORIOS_COLETA.forEach(lab => {
-        const vagasLivresLab = filteredData.filter(item => 
+        const vagasLivresLab = allData.filter(item => 
             item.laboratorioColeta === lab &&
             (!item.nomePaciente || 
              item.nomePaciente.trim() === '' || 
