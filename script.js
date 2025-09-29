@@ -1,3 +1,4 @@
+// Variáveis globais
 let allData = [];
 let filteredData = [];
 let charts = {};
@@ -15,7 +16,7 @@ const UNIDADES_SAUDE = [
 // Laboratórios de Coleta predefinidos
 const LABORATORIOS_COLETA = ['Eldorado', 'Agua Branca', 'Parque São João'];
 
-// Mapeamento CORRETO de Laboratórios por Unidade de Saúde
+// Mapeamento de Laboratórios por Unidade de Saúde
 const LABORATORIO_POR_UNIDADE = {
     'Agua Branca': 'Agua Branca',
     'Jardim Bandeirantes': 'Agua Branca',
@@ -28,49 +29,62 @@ const LABORATORIO_POR_UNIDADE = {
     'Santa Cruz': 'Eldorado'
 };
 
+/**
+ * Função principal para carregar dados da planilha
+ */
 async function loadData() {
     try {
-        document.getElementById('connectionStatus').className = 'status-indicator status-online';
-        document.getElementById('connectionText').textContent = 'Carregando...';
-
-        const response = await fetch(SHEET_URL);
+        showLoadingState(true);
+        
+        // Fazer a requisição usando fetch com configurações adequadas para CORS
+        const response = await fetch(SHEET_URL + '&' + new Date().getTime(), {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/csv',
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
         const csvText = await response.text();
-
+        
         if (!csvText || csvText.length < 100) {
             throw new Error('CSV vazio ou inválido');
         }
 
+        // Processar CSV
         const lines = csvText.split('\n');
         allData = [];
 
-        // Os dados começam na linha 6 (índice 5) e as colunas são C a K (índices 2 a 10)
+        // Os dados começam na linha 6 (índice 5) 
         for (let i = 5; i < lines.length; i++) {
             const line = lines[i].trim();
             if (line) {
                 const values = parseCSVLine(line);
-                // As colunas de interesse são C a K (índices 2 a 10)
                 if (values.length >= 11) {
                     let row = {
                         unidadeSaude: normalizeUnidadeSaude((values[2] || '').trim()), // Coluna C
                         dataAgendamento: (values[3] || '').trim(), // Coluna D
                         horarioAgendamento: (values[4] || '').trim(), // Coluna E
-                        nomePaciente: (values[5] || '').trim(), // Coluna F
-                        telefone: (values[6] || '').trim(), // Coluna G
+                        nomePaciente: (values[5] || '').trim(), // Coluna F (não será exibido)
+                        telefone: (values[6] || '').trim(), // Coluna G (não será exibido)
                         prontuarioVivver: (values[7] || '').trim(), // Coluna H
                         observacaoUnidadeSaude: (values[8] || '').trim(), // Coluna I
                         perfilPacienteExame: (values[9] || '').trim(), // Coluna J
-                        laboratorioColeta: '' // Será definido abaixo
+                        laboratorioColeta: '' // Será definido baseado na unidade
                     };
 
-                    // CORREÇÃO: Definir laboratório de coleta baseado na unidade de saúde
+                    // Definir laboratório de coleta baseado na unidade de saúde
                     if (row.unidadeSaude && LABORATORIO_POR_UNIDADE[row.unidadeSaude]) {
                         row.laboratorioColeta = LABORATORIO_POR_UNIDADE[row.unidadeSaude];
                     } else {
-                        // Fallback para o valor da coluna K se existir
                         row.laboratorioColeta = normalizeLaboratorio((values[10] || '').trim());
                     }
 
-                    // Só adiciona se tiver pelo menos unidade de saúde E data válida
+                    // Só adiciona se tiver unidade e data válidas
                     if (row.unidadeSaude !== '' && row.dataAgendamento !== '' && isValidDate(row.dataAgendamento)) {
                         allData.push(row);
                     }
@@ -98,19 +112,49 @@ async function loadData() {
         updateDashboard();
         updateStats();
 
-        document.getElementById('connectionStatus').className = 'status-indicator status-online';
-        document.getElementById('connectionText').textContent = 'Conectado';
-        document.getElementById('lastUpdate').textContent = `Última atualização: ${new Date().toLocaleString('pt-BR')}`;
-        document.getElementById('lastUpdateDate').textContent = new Date().toLocaleDateString('pt-BR');
+        showConnectionSuccess();
 
     } catch (error) {
         console.error('Erro ao carregar dados:', error);
-        document.getElementById('connectionStatus').className = 'status-indicator status-offline';
-        document.getElementById('connectionText').textContent = 'Erro de conexão';
+        showConnectionError();
         loadSampleData(); // Fallback para dados de exemplo
     }
 }
 
+/**
+ * Função para mostrar estado de carregamento
+ */
+function showLoadingState(loading) {
+    const status = document.getElementById('connectionStatus');
+    const text = document.getElementById('connectionText');
+    
+    if (loading) {
+        status.className = 'status-indicator loading';
+        text.textContent = 'Carregando dados...';
+    }
+}
+
+/**
+ * Função para mostrar sucesso na conexão
+ */
+function showConnectionSuccess() {
+    document.getElementById('connectionStatus').className = 'status-indicator status-online';
+    document.getElementById('connectionText').textContent = 'Conectado';
+    document.getElementById('lastUpdate').textContent = `Última atualização: ${new Date().toLocaleString('pt-BR')}`;
+    document.getElementById('lastUpdateDate').textContent = new Date().toLocaleDateString('pt-BR');
+}
+
+/**
+ * Função para mostrar erro na conexão
+ */
+function showConnectionError() {
+    document.getElementById('connectionStatus').className = 'status-indicator status-offline';
+    document.getElementById('connectionText').textContent = 'Erro de conexão';
+}
+
+/**
+ * Função para normalizar nomes das unidades de saúde
+ */
 function normalizeUnidadeSaude(unidade) {
     if (!unidade) return '';
     const upper = unidade.toUpperCase();
@@ -129,6 +173,9 @@ function normalizeUnidadeSaude(unidade) {
     return unidade;
 }
 
+/**
+ * Função para normalizar nomes dos laboratórios
+ */
 function normalizeLaboratorio(lab) {
     if (!lab) return '';
     const upper = lab.toUpperCase();
@@ -140,14 +187,19 @@ function normalizeLaboratorio(lab) {
     return lab;
 }
 
+/**
+ * Função para validar se a data é válida
+ */
 function isValidDate(dateStr) {
     if (!dateStr) return false;
     const date = parseDate(dateStr);
     return date && !isNaN(date.getTime());
 }
 
+/**
+ * Carrega dados de exemplo quando não consegue acessar a planilha
+ */
 function loadSampleData() {
-    // Dados de exemplo com mapeamento CORRETO dos laboratórios
     allData = [
         { 
             unidadeSaude: 'Agua Branca', 
@@ -169,7 +221,7 @@ function loadSampleData() {
             prontuarioVivver: '54321',
             observacaoUnidadeSaude: 'Primeira consulta',
             perfilPacienteExame: 'Exame preventivo',
-            laboratorioColeta: 'Agua Branca' // CORRETO - Jardim Bandeirantes usa Agua Branca
+            laboratorioColeta: 'Agua Branca'
         },
         { 
             unidadeSaude: 'Csu Eldorado', 
@@ -180,7 +232,7 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Eldorado' // CORRETO - Csu Eldorado usa Eldorado
+            laboratorioColeta: 'Eldorado'
         },
         { 
             unidadeSaude: 'Perobas', 
@@ -191,7 +243,7 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Parque São João' // CORRETO - Perobas usa Parque São João
+            laboratorioColeta: 'Parque São João'
         },
         { 
             unidadeSaude: 'Santa Cruz', 
@@ -202,7 +254,7 @@ function loadSampleData() {
             prontuarioVivver: '98765',
             observacaoUnidadeSaude: 'Retorno',
             perfilPacienteExame: 'Exame de sangue',
-            laboratorioColeta: 'Eldorado' // CORRETO - Santa Cruz usa Eldorado
+            laboratorioColeta: 'Eldorado'
         }
     ];
     filteredData = [...allData];
@@ -211,6 +263,9 @@ function loadSampleData() {
     updateStats();
 }
 
+/**
+ * Função para processar linha de CSV considerando aspas
+ */
 function parseCSVLine(line) {
     const result = [];
     let current = '';
@@ -231,8 +286,11 @@ function parseCSVLine(line) {
     return result;
 }
 
+/**
+ * Atualiza os filtros com as opções disponíveis
+ */
 function updateFilters() {
-    // Horários únicos dos dados
+    // Obter horários únicos dos dados
     const horariosSet = new Set();
     allData.forEach(item => {
         if (item.horarioAgendamento && item.horarioAgendamento.trim()) {
@@ -240,21 +298,31 @@ function updateFilters() {
         }
     });
 
+    // Atualizar as opções dos filtros
     updateSelectOptions('unidadeSaudeFilter', UNIDADES_SAUDE);
     updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
     updateSelectOptions('laboratorioColetaFilter', LABORATORIOS_COLETA);
 
-    // Reinicializar Select2
+    // Inicializar Select2 com configuração melhorada
     $('.filter-select').select2({
         placeholder: 'Selecione uma ou mais opções',
-        allowClear: true
-    }).off('change').on('change', applyFilters);
+        allowClear: true,
+        closeOnSelect: false,
+        width: '100%'
+    }).off('change').on('change', function() {
+        // Delay para melhor performance
+        setTimeout(applyFilters, 100);
+    });
 
     // Aplicar evento ao filtro de data
-    document.getElementById('dataFilter').removeEventListener('change', applyFilters);
-    document.getElementById('dataFilter').addEventListener('change', applyFilters);
+    $('#dataFilter').off('change').on('change', function() {
+        setTimeout(applyFilters, 100);
+    });
 }
 
+/**
+ * Atualiza as opções de um select
+ */
 function updateSelectOptions(selectId, options) {
     const select = $(`#${selectId}`);
     select.empty();
@@ -264,34 +332,50 @@ function updateSelectOptions(selectId, options) {
     select.trigger('change');
 }
 
-// CORREÇÃO PRINCIPAL: Função applyFilters corrigida para filtrar por laboratório
+/**
+ * Aplica os filtros selecionados aos dados
+ */
 function applyFilters() {
-    const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
-    const horarioFilter = $('#horarioFilter').val() || [];
-    const dataFilter = document.getElementById('dataFilter').value;
-    const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
+    try {
+        const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
+        const horarioFilter = $('#horarioFilter').val() || [];
+        const dataFilter = document.getElementById('dataFilter').value;
+        const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
 
-    // FILTRAR POR DADOS REAIS (allData) APLICANDO TODOS OS FILTROS
-    filteredData = allData.filter(item => {
-        let inUnidade = unidadeSaudeFilter.length === 0 || unidadeSaudeFilter.includes(item.unidadeSaude);
-        let inHorario = horarioFilter.length === 0 || horarioFilter.includes(item.horarioAgendamento);
-        let inLaboratorio = laboratorioColetaFilter.length === 0 || laboratorioColetaFilter.includes(item.laboratorioColeta);
-        
-        let inDate = true;
-        if (dataFilter) {
-            const itemDate = item.dataAgendamento ? parseDate(item.dataAgendamento) : null;
-            const filterDate = new Date(dataFilter);
-            inDate = itemDate && itemDate.toDateString() === filterDate.toDateString();
-        }
+        // Aplicar todos os filtros
+        filteredData = allData.filter(item => {
+            // Filtro por unidade de saúde
+            const matchUnidade = unidadeSaudeFilter.length === 0 || unidadeSaudeFilter.includes(item.unidadeSaude);
+            
+            // Filtro por horário
+            const matchHorario = horarioFilter.length === 0 || horarioFilter.includes(item.horarioAgendamento);
+            
+            // Filtro por laboratório
+            const matchLaboratorio = laboratorioColetaFilter.length === 0 || laboratorioColetaFilter.includes(item.laboratorioColeta);
+            
+            // Filtro por data
+            let matchData = true;
+            if (dataFilter) {
+                const itemDate = parseDate(item.dataAgendamento);
+                const filterDate = new Date(dataFilter);
+                matchData = itemDate && itemDate.toDateString() === filterDate.toDateString();
+            }
 
-        return inUnidade && inHorario && inLaboratorio && inDate;
-    });
+            return matchUnidade && matchHorario && matchLaboratorio && matchData;
+        });
 
-    // QUANDO FILTRAR POR LABORATÓRIO, TAMBÉM ATUALIZAR O DATASET BASE DOS GRÁFICOS
-    updateDashboard();
-    updateStats();
+        // Atualizar dashboard e estatísticas
+        updateDashboard();
+        updateStats();
+
+    } catch (error) {
+        console.error('Erro ao aplicar filtros:', error);
+    }
 }
 
+/**
+ * Converte string de data DD/MM/YYYY para objeto Date
+ */
 function parseDate(dateStr) {
     if (!dateStr) return null;
     const parts = dateStr.split('/');
@@ -301,44 +385,61 @@ function parseDate(dateStr) {
     return null;
 }
 
+/**
+ * Atualiza as estatísticas do dashboard
+ */
 function updateStats() {
     const totalVagas = filteredData.length;
-    // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
+    
+    // Vagas ocupadas são aquelas que têm nome do paciente preenchido
     const vagasOcupadas = filteredData.filter(item => 
         item.nomePaciente && 
         item.nomePaciente.trim() !== '' && 
         item.nomePaciente.trim().toLowerCase() !== 'preencher'
     ).length;
+    
     const vagasLivres = totalVagas - vagasOcupadas;
     const taxaOcupacao = totalVagas > 0 ? (vagasOcupadas / totalVagas * 100).toFixed(1) + '%' : '0.0%';
 
+    // Atualizar elementos da UI
     document.getElementById('totalVagas').textContent = totalVagas.toLocaleString();
     document.getElementById('vagasOcupadas').textContent = vagasOcupadas.toLocaleString();
     document.getElementById('vagasLivres').textContent = vagasLivres.toLocaleString();
     document.getElementById('taxaOcupacao').textContent = taxaOcupacao;
 }
 
+/**
+ * Registra o plugin de labels do Chart.js
+ */
 Chart.register(ChartDataLabels);
 
+/**
+ * Atualiza o dashboard completo
+ */
 function updateDashboard() {
     updateCharts();
     updateTable();
     updateSummaryTables();
 }
 
+/**
+ * Atualiza todos os gráficos
+ */
 function updateCharts() {
     updateChartProximosAgendamentosUnidade();
     updateChartProximosAgendamentosLaboratorio();
 }
 
-// GRÁFICO CORRIGIDO: Dias até próximo agendamento por Unidade (USANDO filteredData PARA RESPEITAR FILTROS)
+/**
+ * Gráfico: Dias até próximo agendamento por Unidade
+ */
 function updateChartProximosAgendamentosUnidade() {
     const proximosAgendamentosPorUnidade = {};
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     
-    // USAR filteredData EM VEZ DE allData PARA RESPEITAR OS FILTROS
-    const datasetBase = filteredData.length > 0 ? filteredData : allData;
+    // Usar filteredData se houver filtros aplicados, senão usar allData
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
     
     // Para cada unidade, encontrar o próximo agendamento disponível (vaga livre)
     UNIDADES_SAUDE.forEach(unidade => {
@@ -366,12 +467,16 @@ function updateChartProximosAgendamentosUnidade() {
 
     const dadosOrdenados = Object.entries(proximosAgendamentosPorUnidade)
         .sort((a, b) => a[1] - b[1])
-        .slice(0, 10); // Limitar a 10 unidades
+        .slice(0, 10);
 
-    const ctx = document.getElementById('chartUltimaDataUnidade').getContext('2d');
-    if (charts.ultimaDataUnidade) charts.ultimaDataUnidade.destroy();
+    const ctx = document.getElementById('chartUltimaDataUnidade');
+    if (!ctx) return;
+    
+    if (charts.ultimaDataUnidade) {
+        charts.ultimaDataUnidade.destroy();
+    }
 
-    charts.ultimaDataUnidade = new Chart(ctx, {
+    charts.ultimaDataUnidade = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: dadosOrdenados.map(item => item[0]),
@@ -417,14 +522,16 @@ function updateChartProximosAgendamentosUnidade() {
     });
 }
 
-// GRÁFICO CORRIGIDO: Dias até próximo agendamento por Laboratório (USANDO filteredData PARA RESPEITAR FILTROS)
+/**
+ * Gráfico: Dias até próximo agendamento por Laboratório
+ */
 function updateChartProximosAgendamentosLaboratorio() {
     const proximosAgendamentosPorLab = {};
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     
-    // USAR filteredData EM VEZ DE allData PARA RESPEITAR OS FILTROS
-    const datasetBase = filteredData.length > 0 ? filteredData : allData;
+    // Usar filteredData se houver filtros aplicados, senão usar allData
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
     
     // Para cada laboratório, encontrar o próximo agendamento disponível (vaga livre)
     LABORATORIOS_COLETA.forEach(lab => {
@@ -453,10 +560,14 @@ function updateChartProximosAgendamentosLaboratorio() {
     const dadosOrdenados = Object.entries(proximosAgendamentosPorLab)
         .sort((a, b) => a[1] - b[1]);
 
-    const ctx = document.getElementById('chartUltimaDataLaboratorio').getContext('2d');
-    if (charts.ultimaDataLaboratorio) charts.ultimaDataLaboratorio.destroy();
+    const ctx = document.getElementById('chartUltimaDataLaboratorio');
+    if (!ctx) return;
+    
+    if (charts.ultimaDataLaboratorio) {
+        charts.ultimaDataLaboratorio.destroy();
+    }
 
-    charts.ultimaDataLaboratorio = new Chart(ctx, {
+    charts.ultimaDataLaboratorio = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: dadosOrdenados.map(item => item[0]),
@@ -502,7 +613,9 @@ function updateChartProximosAgendamentosLaboratorio() {
     });
 }
 
-// TABELA CORRIGIDA: Removidas as colunas Nome do Paciente e Telefone
+/**
+ * Atualiza a tabela principal (sem nome e telefone)
+ */
 function updateTable() {
     // Destruir a tabela anterior se existir
     if (dataTable) {
@@ -533,33 +646,39 @@ function updateTable() {
     `).join('');
     
     // Inicializar o DataTable
-    dataTable = $('#agendamentosTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
-        },
-        pageLength: 15,
-        responsive: true,
-        order: [[1, 'asc']], // Ordenar por data
-        columnDefs: [
-            { 
-                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo
-                render: function(data, type, row) {
-                    if (type === 'display' && data && data.length > 30) {
-                        return `<span title="${data}">${data.substr(0, 30)}...</span>`;
+    try {
+        dataTable = $('#agendamentosTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+            },
+            pageLength: 15,
+            responsive: true,
+            order: [[1, 'asc']], // Ordenar por data
+            columnDefs: [
+                { 
+                    targets: [0, 4, 5, 6], // Colunas que podem ter texto longo
+                    render: function(data, type, row) {
+                        if (type === 'display' && data && data.length > 30) {
+                            return `<span title="${data}">${data.substr(0, 30)}...</span>`;
+                        }
+                        return data;
                     }
-                    return data;
                 }
-            }
-        ]
-    });
+            ]
+        });
+    } catch (error) {
+        console.error('Erro ao inicializar DataTable:', error);
+    }
 }
 
-// TABELAS DE RESUMO CORRIGIDAS: Usar filteredData quando filtros aplicados, allData caso contrário
+/**
+ * Atualiza as tabelas de resumo
+ */
 function updateSummaryTables() {
     // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
-    // Pacientes por Dia/Unidade (apenas com nome preenchido) 
+    // Pacientes por Dia/Unidade (apenas com nome preenchido)
     const dayUnidadeCount = {};
     datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
@@ -571,7 +690,7 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesDiaUnidade', Object.entries(dayUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Unidade (apenas com nome preenchido) 
+    // Pacientes por Mês/Unidade (apenas com nome preenchido)
     const monthUnidadeCount = {};
     datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
@@ -587,7 +706,7 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesUnidade', Object.entries(monthUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Dia/Laboratório (apenas com nome preenchido) 
+    // Pacientes por Dia/Laboratório (apenas com nome preenchido)
     const dayLabCount = {};
     datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
@@ -599,7 +718,7 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesDiaLab', Object.entries(dayLabCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Laboratório (apenas com nome preenchido) 
+    // Pacientes por Mês/Laboratório (apenas com nome preenchido)
     const monthLabCount = {};
     datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
@@ -615,7 +734,14 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesLab', Object.entries(monthLabCount).sort((a, b) => b[1] - a[1]));
 
-    // TABELAS DE VAGAS LIVRES 
+    // TABELAS DE VAGAS LIVRES
+    updateVagasLivresTables(datasetBase);
+}
+
+/**
+ * Atualiza as tabelas de vagas livres
+ */
+function updateVagasLivresTables(datasetBase) {
     // Vagas Livres por Dia/Unidade
     const vagasLivresDiaUnidade = {};
     datasetBase.forEach(item => {
@@ -673,7 +799,9 @@ function updateSummaryTables() {
     updateSummaryTable('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
 }
 
-// Função auxiliar para verificar se há filtros ativos
+/**
+ * Função auxiliar para verificar se há filtros ativos
+ */
 function hasActiveFilters() {
     const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
     const horarioFilter = $('#horarioFilter').val() || [];
@@ -683,6 +811,9 @@ function hasActiveFilters() {
     return unidadeSaudeFilter.length > 0 || horarioFilter.length > 0 || dataFilter || laboratorioColetaFilter.length > 0;
 }
 
+/**
+ * Atualiza uma tabela de resumo específica
+ */
 function updateSummaryTable(tableId, data) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     if (tableBody) {
@@ -702,34 +833,111 @@ function updateSummaryTable(tableId, data) {
     }
 }
 
+/**
+ * Limpa todos os filtros
+ */
 function clearFilters() {
-    $('.filter-select').val(null).trigger('change');
-    document.getElementById('dataFilter').value = '';
-    applyFilters();
+    try {
+        $('.filter-select').val(null).trigger('change');
+        document.getElementById('dataFilter').value = '';
+        
+        // Resetar para todos os dados
+        filteredData = [...allData];
+        updateDashboard();
+        updateStats();
+        
+    } catch (error) {
+        console.error('Erro ao limpar filtros:', error);
+    }
 }
 
-// EXPORTAÇÃO CORRIGIDA: Sem nome do paciente e telefone
+/**
+ * Atualiza a página (recarrega os dados)
+ */
+function refreshPage() {
+    try {
+        // Mostrar feedback visual
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Atualizando...';
+        btn.disabled = true;
+        
+        // Recarregar os dados
+        loadData().finally(() => {
+            // Restaurar o botão
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+        
+    } catch (error) {
+        console.error('Erro ao atualizar página:', error);
+    }
+}
+
+/**
+ * Exporta os dados filtrados para Excel (sem nome e telefone)
+ */
 function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(filteredData.map(item => ({
-        'UNIDADE DE SAÚDE': item.unidadeSaude || '',
-        'DATA': item.dataAgendamento || '',
-        'HORÁRIO': item.horarioAgendamento || '',
-        'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
-        'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
-        'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
-        'LABORATÓRIO DE COLETA': item.laboratorioColeta || ''
-    })));
-    
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Agendamentos');
-    
-    XLSX.writeFile(wb, `agendamentos_eldorado_${new Date().toISOString().split('T')[0]}.xlsx`);
+    try {
+        // Mostrar feedback visual
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exportando...';
+        btn.disabled = true;
+        
+        // Preparar dados para exportação (sem nome e telefone)
+        const exportData = filteredData.map(item => ({
+            'UNIDADE DE SAÚDE': item.unidadeSaude || '',
+            'DATA': item.dataAgendamento || '',
+            'HORÁRIO': item.horarioAgendamento || '',
+            'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
+            'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
+            'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
+            'LABORATÓRIO DE COLETA': item.laboratorioColeta || ''
+        }));
+        
+        // Criar planilha
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Agendamentos');
+        
+        // Nome do arquivo com data atual
+        const hoje = new Date();
+        const dataFormatada = hoje.toISOString().split('T')[0];
+        const nomeArquivo = `agendamentos_eldorado_${dataFormatada}.xlsx`;
+        
+        // Fazer download
+        XLSX.writeFile(wb, nomeArquivo);
+        
+        // Restaurar o botão
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Erro ao exportar Excel:', error);
+        alert('Erro ao exportar arquivo Excel. Tente novamente.');
+    }
 }
 
+/**
+ * Inicialização quando o DOM está carregado
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Definir data mínima para o filtro de data como 01/11/2025
-    document.getElementById('dataFilter').min = '2025-11-01';
-    
-    loadData();
-    setInterval(loadData, 300000); // Auto-atualização a cada 5 minutos
+    try {
+        // Definir data mínima para o filtro de data como 01/11/2025
+        document.getElementById('dataFilter').min = '2025-11-01';
+        
+        // Carregar dados iniciais
+        loadData();
+        
+        // Auto-atualização a cada 5 minutos
+        setInterval(loadData, 300000);
+        
+        console.log('Painel inicializado com sucesso');
+        
+    } catch (error) {
+        console.error('Erro na inicialização:', error);
+    }
 });
