@@ -245,9 +245,22 @@ function updateFilters() {
         }
     });
 
+    // Mês/Ano únicos dos dados
+    const mesAnoSet = new Set();
+    allData.forEach(item => {
+        if (item.dataAgendamento) {
+            const date = parseDate(item.dataAgendamento);
+            if (date) {
+                const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                mesAnoSet.add(monthYear);
+            }
+        }
+    });
+
     updateSelectOptions('unidadeSaudeFilter', UNIDADES_SAUDE);
-    updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
     updateSelectOptions('laboratorioColetaFilter', LABORATORIOS_COLETA);
+    updateSelectOptions('mesAnoFilter', Array.from(mesAnoSet).sort());
+    updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
 
     // Reinicializar Select2
     $('.filter-select').select2({
@@ -271,15 +284,27 @@ function updateSelectOptions(selectId, options) {
 
 function applyFilters() {
     const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
-    const horarioFilter = $('#horarioFilter').val() || [];
-    const dataFilter = document.getElementById('dataFilter').value;
     const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
+    const mesAnoFilter = $('#mesAnoFilter').val() || [];
+    const dataFilter = document.getElementById('dataFilter').value;
+    const horarioFilter = $('#horarioFilter').val() || [];
 
     // FILTRAR POR DADOS REAIS (allData) APLICANDO TODOS OS FILTROS
     filteredData = allData.filter(item => {
         let inUnidade = unidadeSaudeFilter.length === 0 || unidadeSaudeFilter.includes(item.unidadeSaude);
-        let inHorario = horarioFilter.length === 0 || horarioFilter.includes(item.horarioAgendamento);
         let inLaboratorio = laboratorioColetaFilter.length === 0 || laboratorioColetaFilter.includes(item.laboratorioColeta);
+        let inHorario = horarioFilter.length === 0 || horarioFilter.includes(item.horarioAgendamento);
+        
+        let inMesAno = true;
+        if (mesAnoFilter.length > 0) {
+            const itemDate = item.dataAgendamento ? parseDate(item.dataAgendamento) : null;
+            if (itemDate) {
+                const itemMesAno = `${String(itemDate.getMonth() + 1).padStart(2, '0')}/${itemDate.getFullYear()}`;
+                inMesAno = mesAnoFilter.includes(itemMesAno);
+            } else {
+                inMesAno = false;
+            }
+        }
         
         let inDate = true;
         if (dataFilter) {
@@ -288,7 +313,7 @@ function applyFilters() {
             inDate = itemDate && itemDate.toDateString() === filterDate.toDateString();
         }
 
-        return inUnidade && inHorario && inLaboratorio && inDate;
+        return inUnidade && inLaboratorio && inMesAno && inDate && inHorario;
     });
 
     updateDashboard();
@@ -674,11 +699,13 @@ function updateSummaryTables() {
 // Função auxiliar para verificar se há filtros ativos
 function hasActiveFilters() {
     const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
-    const horarioFilter = $('#horarioFilter').val() || [];
-    const dataFilter = document.getElementById('dataFilter').value;
     const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
+    const mesAnoFilter = $('#mesAnoFilter').val() || [];
+    const dataFilter = document.getElementById('dataFilter').value;
+    const horarioFilter = $('#horarioFilter').val() || [];
     
-    return unidadeSaudeFilter.length > 0 || horarioFilter.length > 0 || dataFilter || laboratorioColetaFilter.length > 0;
+    return unidadeSaudeFilter.length > 0 || laboratorioColetaFilter.length > 0 || 
+           mesAnoFilter.length > 0 || dataFilter || horarioFilter.length > 0;
 }
 
 function updateSummaryTable(tableId, data) {
