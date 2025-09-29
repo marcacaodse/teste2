@@ -264,12 +264,14 @@ function updateSelectOptions(selectId, options) {
     select.trigger('change');
 }
 
+// CORREÇÃO PRINCIPAL: Função applyFilters corrigida para filtrar por laboratório
 function applyFilters() {
     const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
     const horarioFilter = $('#horarioFilter').val() || [];
     const dataFilter = document.getElementById('dataFilter').value;
     const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
 
+    // FILTRAR POR DADOS REAIS (allData) APLICANDO TODOS OS FILTROS
     filteredData = allData.filter(item => {
         let inUnidade = unidadeSaudeFilter.length === 0 || unidadeSaudeFilter.includes(item.unidadeSaude);
         let inHorario = horarioFilter.length === 0 || horarioFilter.includes(item.horarioAgendamento);
@@ -285,6 +287,7 @@ function applyFilters() {
         return inUnidade && inHorario && inLaboratorio && inDate;
     });
 
+    // QUANDO FILTRAR POR LABORATÓRIO, TAMBÉM ATUALIZAR O DATASET BASE DOS GRÁFICOS
     updateDashboard();
     updateStats();
 }
@@ -328,15 +331,18 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
 }
 
-// GRÁFICO: Dias até próximo agendamento por Unidade
+// GRÁFICO CORRIGIDO: Dias até próximo agendamento por Unidade (USANDO filteredData PARA RESPEITAR FILTROS)
 function updateChartProximosAgendamentosUnidade() {
     const proximosAgendamentosPorUnidade = {};
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     
+    // USAR filteredData EM VEZ DE allData PARA RESPEITAR OS FILTROS
+    const datasetBase = filteredData.length > 0 ? filteredData : allData;
+    
     // Para cada unidade, encontrar o próximo agendamento disponível (vaga livre)
     UNIDADES_SAUDE.forEach(unidade => {
-        const vagasLivresUnidade = allData.filter(item => 
+        const vagasLivresUnidade = datasetBase.filter(item => 
             item.unidadeSaude === unidade &&
             (!item.nomePaciente || 
              item.nomePaciente.trim() === '' || 
@@ -411,14 +417,18 @@ function updateChartProximosAgendamentosUnidade() {
     });
 }
 
+// GRÁFICO CORRIGIDO: Dias até próximo agendamento por Laboratório (USANDO filteredData PARA RESPEITAR FILTROS)
 function updateChartProximosAgendamentosLaboratorio() {
     const proximosAgendamentosPorLab = {};
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     
+    // USAR filteredData EM VEZ DE allData PARA RESPEITAR OS FILTROS
+    const datasetBase = filteredData.length > 0 ? filteredData : allData;
+    
     // Para cada laboratório, encontrar o próximo agendamento disponível (vaga livre)
     LABORATORIOS_COLETA.forEach(lab => {
-        const vagasLivresLab = allData.filter(item => 
+        const vagasLivresLab = datasetBase.filter(item => 
             item.laboratorioColeta === lab &&
             (!item.nomePaciente || 
              item.nomePaciente.trim() === '' || 
@@ -492,6 +502,7 @@ function updateChartProximosAgendamentosLaboratorio() {
     });
 }
 
+// TABELA CORRIGIDA: Removidas as colunas Nome do Paciente e Telefone
 function updateTable() {
     // Destruir a tabela anterior se existir
     if (dataTable) {
@@ -508,14 +519,12 @@ function updateTable() {
     // Limpar o conteúdo anterior
     tableBody.innerHTML = '';
     
-    // Inserir os dados filtrados (COM TODAS AS COLUNAS)
+    // Inserir os dados filtrados (SEM as colunas Nome do Paciente e Telefone)
     tableBody.innerHTML = filteredData.map(item => `
         <tr>
             <td>${item.unidadeSaude || ''}</td>
             <td>${item.dataAgendamento || ''}</td>
             <td>${item.horarioAgendamento || ''}</td>
-            <td>${item.nomePaciente || ''}</td>
-            <td>${item.telefone || ''}</td>
             <td>${item.prontuarioVivver || ''}</td>
             <td>${item.observacaoUnidadeSaude || ''}</td>
             <td>${item.perfilPacienteExame || ''}</td>
@@ -533,7 +542,7 @@ function updateTable() {
         order: [[1, 'asc']], // Ordenar por data
         columnDefs: [
             { 
-                targets: [0, 3, 4, 6, 7, 8], // Colunas que podem ter texto longo
+                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo
                 render: function(data, type, row) {
                     if (type === 'display' && data && data.length > 30) {
                         return `<span title="${data}">${data.substr(0, 30)}...</span>`;
@@ -545,10 +554,14 @@ function updateTable() {
     });
 }
 
+// TABELAS DE RESUMO CORRIGIDAS: Usar filteredData quando filtros aplicados, allData caso contrário
 function updateSummaryTables() {
-    // Pacientes por Dia/Unidade (apenas com nome preenchido) - TODOS OS DADOS
+    // Determinar qual dataset usar baseado nos filtros ativos
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Pacientes por Dia/Unidade (apenas com nome preenchido) 
     const dayUnidadeCount = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -558,9 +571,9 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesDiaUnidade', Object.entries(dayUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Unidade (apenas com nome preenchido) - TODOS OS DADOS
+    // Pacientes por Mês/Unidade (apenas com nome preenchido) 
     const monthUnidadeCount = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -574,9 +587,9 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesUnidade', Object.entries(monthUnidadeCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Dia/Laboratório (apenas com nome preenchido) - TODOS OS DADOS
+    // Pacientes por Dia/Laboratório (apenas com nome preenchido) 
     const dayLabCount = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -586,9 +599,9 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesDiaLab', Object.entries(dayLabCount).sort((a, b) => b[1] - a[1]));
 
-    // Pacientes por Mês/Laboratório (apenas com nome preenchido) - TODOS OS DADOS
+    // Pacientes por Mês/Laboratório (apenas com nome preenchido) 
     const monthLabCount = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             item.nomePaciente && item.nomePaciente.trim() !== '' && 
             item.nomePaciente.trim().toLowerCase() !== 'preencher') {
@@ -602,10 +615,10 @@ function updateSummaryTables() {
     });
     updateSummaryTable('tablePacientesMesLab', Object.entries(monthLabCount).sort((a, b) => b[1] - a[1]));
 
-    // TABELAS DE VAGAS LIVRES - TODOS OS DADOS
+    // TABELAS DE VAGAS LIVRES 
     // Vagas Livres por Dia/Unidade
     const vagasLivresDiaUnidade = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -617,7 +630,7 @@ function updateSummaryTables() {
 
     // Vagas Livres por Mês/Unidade
     const vagasLivresMesUnidade = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.unidadeSaude && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -633,7 +646,7 @@ function updateSummaryTables() {
 
     // Vagas Livres por Dia/Laboratório
     const vagasLivresDiaLab = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -645,7 +658,7 @@ function updateSummaryTables() {
 
     // Vagas Livres por Mês/Laboratório
     const vagasLivresMesLab = {};
-    allData.forEach(item => {
+    datasetBase.forEach(item => {
         if (item.dataAgendamento && item.laboratorioColeta && 
             (!item.nomePaciente || item.nomePaciente.trim() === '' || 
              item.nomePaciente.trim().toLowerCase() === 'preencher')) {
@@ -658,6 +671,16 @@ function updateSummaryTables() {
         }
     });
     updateSummaryTable('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
+}
+
+// Função auxiliar para verificar se há filtros ativos
+function hasActiveFilters() {
+    const unidadeSaudeFilter = $('#unidadeSaudeFilter').val() || [];
+    const horarioFilter = $('#horarioFilter').val() || [];
+    const dataFilter = document.getElementById('dataFilter').value;
+    const laboratorioColetaFilter = $('#laboratorioColetaFilter').val() || [];
+    
+    return unidadeSaudeFilter.length > 0 || horarioFilter.length > 0 || dataFilter || laboratorioColetaFilter.length > 0;
 }
 
 function updateSummaryTable(tableId, data) {
@@ -685,14 +708,12 @@ function clearFilters() {
     applyFilters();
 }
 
+// EXPORTAÇÃO CORRIGIDA: Sem nome do paciente e telefone
 function exportToExcel() {
-    // Na exportação, incluir TODAS as colunas
     const ws = XLSX.utils.json_to_sheet(filteredData.map(item => ({
         'UNIDADE DE SAÚDE': item.unidadeSaude || '',
         'DATA': item.dataAgendamento || '',
         'HORÁRIO': item.horarioAgendamento || '',
-        'NOME DO PACIENTE': item.nomePaciente || '',
-        'TELEFONE': item.telefone || '',
         'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
         'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
         'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
