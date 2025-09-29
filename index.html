@@ -33,7 +33,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">29/09/2025</span></h3>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Filtro Unidades de Saúde -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Unidades de Saúde:</label>
@@ -42,10 +42,18 @@
                     </select>
                 </div>
 
-                <!-- Filtro Horários -->
+                <!-- Filtro Laboratório de Coleta -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Horários:</label>
-                    <select id="horarioFilter" class="filter-select" multiple="multiple" style="width: 100%;">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Laboratório de Coleta:</label>
+                    <select id="laboratorioColetaFilter" class="filter-select" multiple="multiple" style="width: 100%;">
+                        <!-- Opções serão preenchidas dinamicamente -->
+                    </select>
+                </div>
+
+                <!-- Filtro Mês/Ano -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mês/Ano:</label>
+                    <select id="mesAnoFilter" class="filter-select" multiple="multiple" style="width: 100%;">
                         <!-- Opções serão preenchidas dinamicamente -->
                     </select>
                 </div>
@@ -56,10 +64,10 @@
                     <input type="date" id="dataFilter" class="filter-input" min="2025-11-01">
                 </div>
 
-                <!-- Filtro Laboratório de Coleta -->
+                <!-- Filtro Horários -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Laboratório de Coleta:</label>
-                    <select id="laboratorioColetaFilter" class="filter-select" multiple="multiple" style="width: 100%;">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Hora:</label>
+                    <select id="horarioFilter" class="filter-select" multiple="multiple" style="width: 100%;">
                         <!-- Opções serão preenchidas dinamicamente -->
                     </select>
                 </div>
