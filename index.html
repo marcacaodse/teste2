@@ -180,20 +180,29 @@
         </div>
     </div>
 
+    <!-- TABELAS: Vagas Livres -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                <i class="fas fa-calendar-plus mr-2 text-indigo-500"></i>
+                Relatório de Vagas Utilizadas
+            </h3>
+        </div>
+        
     <!-- Tabelas de Resumo -->
     <div class="container mx-auto px-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-            <!-- Tabela: Pacientes por Dia e Unidade -->
+            <!-- Tabela: Pacientes Agendados por Dia/Unidade -->
             <div class="card">
                 <div class="p-4 border-b">
                     <h4 class="text-md font-semibold text-gray-800">
                         <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
-                        Pacientes por Dia/Unidade
+                        Pacientes Agendados por Dia/Unidade
                     </h4>
                 </div>
                 <div class="p-4 table-container-small">
                     <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesDiaUnidade" class="w-full text-sm">
+                        <table id="tablePacientesAgendadosDiaUnidade" class="w-full text-sm">
                             <thead class="sticky top-0 bg-white">
                                 <tr class="border-b">
                                     <th class="text-left py-2">Data/Unidade</th>
@@ -208,17 +217,17 @@
                 </div>
             </div>
 
-            <!-- Tabela: Pacientes por Mês e Unidade -->
+            <!-- Tabela: Pacientes Agendados por Mês/Unidade -->
             <div class="card">
                 <div class="p-4 border-b">
                     <h4 class="text-md font-semibold text-gray-800">
                         <i class="fas fa-chart-bar mr-2 text-green-500"></i>
-                        Pacientes por Mês/Unidade
+                        Pacientes Agendados por Mês/Unidade
                     </h4>
                 </div>
                 <div class="p-4 table-container-small">
                     <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesMesUnidade" class="w-full text-sm">
+                        <table id="tablePacientesAgendadosMesUnidade" class="w-full text-sm">
                             <thead class="sticky top-0 bg-white">
                                 <tr class="border-b">
                                     <th class="text-left py-2">Mês/Unidade</th>
@@ -233,17 +242,17 @@
                 </div>
             </div>
 
-            <!-- Tabela: Pacientes por Dia e Laboratório -->
+            <!-- Tabela: Pacientes Agendados por Dia/Laboratório -->
             <div class="card">
                 <div class="p-4 border-b">
                     <h4 class="text-md font-semibold text-gray-800">
                         <i class="fas fa-chart-bar mr-2 text-purple-500"></i>
-                        Pacientes por Dia/Lab
+                        Pacientes por Dia/Laboratorio
                     </h4>
                 </div>
                 <div class="p-4 table-container-small">
                     <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesDiaLab" class="w-full text-sm">
+                        <table id="tablePacientesAgendadosDiaLaboratorio" class="w-full text-sm">
                             <thead class="sticky top-0 bg-white">
                                 <tr class="border-b">
                                     <th class="text-left py-2">Data/Laboratório</th>
@@ -258,17 +267,17 @@
                 </div>
             </div>
 
-            <!-- Tabela: Pacientes por Mês e Laboratório -->
+            <!-- Tabela: Pacientes Agendados por Mês/Laboratório -->
             <div class="card">
                 <div class="p-4 border-b">
                     <h4 class="text-md font-semibold text-gray-800">
                         <i class="fas fa-chart-bar mr-2 text-red-500"></i>
-                        Pacientes por Mês/Lab
+                        Pacientes Agendados por Mês/Laboratório
                     </h4>
                 </div>
                 <div class="p-4 table-container-small">
                     <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesMesLab" class="w-full text-sm">
+                        <table id="tablePacientesAgendadosMesLab" class="w-full text-sm">
                             <thead class="sticky top-0 bg-white">
                                 <tr class="border-b">
                                     <th class="text-left py-2">Mês/Laboratório</th>
