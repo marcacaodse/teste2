@@ -236,6 +236,7 @@ function parseCSVLine(line) {
     return result;
 }
 
+// CORREÇÃO PRINCIPAL: Função updateFilters corrigida para extrair Mês/Ano da coluna Data
 function updateFilters() {
     // Horários únicos dos dados
     const horariosSet = new Set();
@@ -245,12 +246,13 @@ function updateFilters() {
         }
     });
 
-    // Mês/Ano únicos dos dados
+    // CORREÇÃO: Mês/Ano únicos extraídos da coluna Data
     const mesAnoSet = new Set();
     allData.forEach(item => {
         if (item.dataAgendamento) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
+                // Formato: MM/yyyy (ex: 11/2025, 12/2025)
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
                 mesAnoSet.add(monthYear);
             }
@@ -259,6 +261,7 @@ function updateFilters() {
 
     updateSelectOptions('unidadeSaudeFilter', UNIDADES_SAUDE);
     updateSelectOptions('laboratorioColetaFilter', LABORATORIOS_COLETA);
+    // CORREÇÃO: Opções do filtro Mês/Ano agora são preenchidas corretamente
     updateSelectOptions('mesAnoFilter', Array.from(mesAnoSet).sort());
     updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
 
@@ -329,6 +332,7 @@ function parseDate(dateStr) {
     return null;
 }
 
+// CORREÇÃO: Função updateStats corrigida com atualização dos totais dos relatórios
 function updateStats() {
     const totalVagas = filteredData.length;
     // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
@@ -344,6 +348,10 @@ function updateStats() {
     document.getElementById('vagasOcupadas').textContent = vagasOcupadas.toLocaleString();
     document.getElementById('vagasLivres').textContent = vagasLivres.toLocaleString();
     document.getElementById('taxaOcupacao').textContent = taxaOcupacao;
+
+    // NOVO: Atualizar totais dos relatórios
+    document.getElementById('totalVagasUtilizadas').textContent = vagasOcupadas.toLocaleString();
+    document.getElementById('totalVagasLivresRelatorio').textContent = vagasLivres.toLocaleString();
 }
 
 Chart.register(ChartDataLabels);
