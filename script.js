@@ -15,7 +15,7 @@ const UNIDADES_SAUDE = [
 // Laboratórios de Coleta predefinidos
 const LABORATORIOS_COLETA = ['Eldorado', 'Agua Branca', 'Parque São João'];
 
-// Mapeamento de Laboratórios por Unidade de Saúde (CORRIGIDO)
+// Mapeamento CORRETO de Laboratórios por Unidade de Saúde
 const LABORATORIO_POR_UNIDADE = {
     'Agua Branca': 'Agua Branca',
     'Jardim Bandeirantes': 'Agua Branca',
@@ -147,7 +147,7 @@ function isValidDate(dateStr) {
 }
 
 function loadSampleData() {
-    // Dados de exemplo com mapeamento correto dos laboratórios
+    // Dados de exemplo com mapeamento CORRETO dos laboratórios
     allData = [
         { 
             unidadeSaude: 'Agua Branca', 
@@ -169,7 +169,7 @@ function loadSampleData() {
             prontuarioVivver: '54321',
             observacaoUnidadeSaude: 'Primeira consulta',
             perfilPacienteExame: 'Exame preventivo',
-            laboratorioColeta: 'Agua Branca' // Corrigido - Jardim Bandeirantes usa Agua Branca
+            laboratorioColeta: 'Agua Branca' // CORRETO - Jardim Bandeirantes usa Agua Branca
         },
         { 
             unidadeSaude: 'Csu Eldorado', 
@@ -180,7 +180,7 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Eldorado' // Corrigido - Csu Eldorado usa Eldorado
+            laboratorioColeta: 'Eldorado' // CORRETO - Csu Eldorado usa Eldorado
         },
         { 
             unidadeSaude: 'Perobas', 
@@ -191,7 +191,18 @@ function loadSampleData() {
             prontuarioVivver: '',
             observacaoUnidadeSaude: 'Preencher',
             perfilPacienteExame: 'Preencher',
-            laboratorioColeta: 'Parque São João' // Corrigido - Perobas usa Parque São João
+            laboratorioColeta: 'Parque São João' // CORRETO - Perobas usa Parque São João
+        },
+        { 
+            unidadeSaude: 'Santa Cruz', 
+            dataAgendamento: '20/12/2025', 
+            horarioAgendamento: '9h30', 
+            nomePaciente: 'Ana Costa', 
+            telefone: '(11) 77777-7777',
+            prontuarioVivver: '98765',
+            observacaoUnidadeSaude: 'Retorno',
+            perfilPacienteExame: 'Exame de sangue',
+            laboratorioColeta: 'Eldorado' // CORRETO - Santa Cruz usa Eldorado
         }
     ];
     filteredData = [...allData];
@@ -317,7 +328,7 @@ function updateCharts() {
     updateChartProximosAgendamentosLaboratorio();
 }
 
-// CORREÇÃO: Lógica dos gráficos para mostrar dias até próximo agendamento
+// GRÁFICO: Dias até próximo agendamento por Unidade
 function updateChartProximosAgendamentosUnidade() {
     const proximosAgendamentosPorUnidade = {};
     const hoje = new Date();
@@ -497,12 +508,14 @@ function updateTable() {
     // Limpar o conteúdo anterior
     tableBody.innerHTML = '';
     
-    // Inserir os dados filtrados (SEM as colunas Nome do Paciente e Telefone)
+    // Inserir os dados filtrados (COM TODAS AS COLUNAS)
     tableBody.innerHTML = filteredData.map(item => `
         <tr>
             <td>${item.unidadeSaude || ''}</td>
             <td>${item.dataAgendamento || ''}</td>
             <td>${item.horarioAgendamento || ''}</td>
+            <td>${item.nomePaciente || ''}</td>
+            <td>${item.telefone || ''}</td>
             <td>${item.prontuarioVivver || ''}</td>
             <td>${item.observacaoUnidadeSaude || ''}</td>
             <td>${item.perfilPacienteExame || ''}</td>
@@ -520,7 +533,7 @@ function updateTable() {
         order: [[1, 'asc']], // Ordenar por data
         columnDefs: [
             { 
-                targets: [0, 4, 5, 6], // Colunas que podem ter texto longo
+                targets: [0, 3, 4, 6, 7, 8], // Colunas que podem ter texto longo
                 render: function(data, type, row) {
                     if (type === 'display' && data && data.length > 30) {
                         return `<span title="${data}">${data.substr(0, 30)}...</span>`;
@@ -673,11 +686,13 @@ function clearFilters() {
 }
 
 function exportToExcel() {
-    // Na exportação, incluir apenas as colunas visíveis (sem nome e telefone)
+    // Na exportação, incluir TODAS as colunas
     const ws = XLSX.utils.json_to_sheet(filteredData.map(item => ({
         'UNIDADE DE SAÚDE': item.unidadeSaude || '',
         'DATA': item.dataAgendamento || '',
         'HORÁRIO': item.horarioAgendamento || '',
+        'NOME DO PACIENTE': item.nomePaciente || '',
+        'TELEFONE': item.telefone || '',
         'Nº PRONTUÁRIO VIVVER': item.prontuarioVivver || '',
         'OBSERVAÇÃO/ UNIDADE DE SAÚDE': item.observacaoUnidadeSaude || '',
         'PERFIL DO PACIENTE OU TIPO DO EXAME': item.perfilPacienteExame || '',
