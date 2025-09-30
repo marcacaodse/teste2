@@ -121,6 +121,18 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* NOVO: Estilo para exibição dos filtros selecionados */
+.selected-filters-display {
+    min-height: 20px;
+}
+
+.selected-filters-display .inline-block {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
 /* Select2 Customização */
 .select2-container--default .select2-selection--multiple {
     border: 1px solid #d1d5db !important;
@@ -277,6 +289,12 @@ body {
     .grid {
         gap: 16px;
     }
+    
+    /* Mobile: Reduzir tamanho das etiquetas de filtros */
+    .selected-filters-display .inline-block {
+        max-width: 80px;
+        font-size: 10px;
+    }
 }
 
 @media print {
@@ -300,6 +318,11 @@ body {
         background: #1e3a8a !important;
         -webkit-print-color-adjust: exact;
         color-adjust: exact;
+    }
+    
+    /* Ocultar exibições de filtros na impressão */
+    .selected-filters-display {
+        display: none !important;
     }
 }
 
