@@ -12,7 +12,7 @@ const UNIDADES_SAUDE = [
     'Novo Eldorado', 'Jardim Eldorado', 'Santa Cruz', 'Perobas', 'Parque São João'
 ];
 
-// Laboratórios de Coleta predefinidos
+// Laboratórios de Coleta predefinidos  
 const LABORATORIOS_COLETA = ['Eldorado', 'Agua Branca', 'Parque São João'];
 
 // Mapeamento CORRETO de Laboratórios por Unidade de Saúde
@@ -236,7 +236,6 @@ function parseCSVLine(line) {
     return result;
 }
 
-// CORREÇÃO PRINCIPAL: Função updateFilters corrigida para extrair Mês/Ano da coluna Data
 function updateFilters() {
     // Horários únicos dos dados
     const horariosSet = new Set();
@@ -246,13 +245,12 @@ function updateFilters() {
         }
     });
 
-    // CORREÇÃO: Mês/Ano únicos extraídos da coluna Data
+    // Mês/Ano únicos dos dados
     const mesAnoSet = new Set();
     allData.forEach(item => {
         if (item.dataAgendamento) {
             const date = parseDate(item.dataAgendamento);
             if (date) {
-                // Formato: MM/yyyy (ex: 11/2025, 12/2025)
                 const monthYear = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
                 mesAnoSet.add(monthYear);
             }
@@ -261,19 +259,29 @@ function updateFilters() {
 
     updateSelectOptions('unidadeSaudeFilter', UNIDADES_SAUDE);
     updateSelectOptions('laboratorioColetaFilter', LABORATORIOS_COLETA);
-    // CORREÇÃO: Opções do filtro Mês/Ano agora são preenchidas corretamente
     updateSelectOptions('mesAnoFilter', Array.from(mesAnoSet).sort());
     updateSelectOptions('horarioFilter', Array.from(horariosSet).sort());
 
-    // Reinicializar Select2
+    // Reinicializar Select2 com eventos personalizados
     $('.filter-select').select2({
         placeholder: 'Selecione uma ou mais opções',
         allowClear: true
-    }).off('change').on('change', applyFilters);
+    }).off('change').on('change', function() {
+        applyFilters();
+        updateFilterDisplays();
+    });
 
     // Aplicar evento ao filtro de data
-    document.getElementById('dataFilter').removeEventListener('change', applyFilters);
-    document.getElementById('dataFilter').addEventListener('change', applyFilters);
+    document.getElementById('dataFilter').removeEventListener('change', handleDateFilterChange);
+    document.getElementById('dataFilter').addEventListener('change', handleDateFilterChange);
+
+    // Atualizar exibições dos filtros inicialmente
+    updateFilterDisplays();
+}
+
+function handleDateFilterChange() {
+    applyFilters();
+    updateFilterDisplays();
 }
 
 function updateSelectOptions(selectId, options) {
@@ -283,6 +291,57 @@ function updateSelectOptions(selectId, options) {
         select.append(new Option(option, option, false, false));
     });
     select.trigger('change');
+}
+
+// NOVA FUNÇÃO: Atualizar exibições dos filtros selecionados
+function updateFilterDisplays() {
+    // Unidades de Saúde
+    const unidadeSelecionadas = $('#unidadeSaudeFilter').val() || [];
+    updateFilterDisplay('unidadeSaudeSelected', unidadeSelecionadas, 'Unidades selecionadas');
+
+    // Laboratórios
+    const labsSelecionados = $('#laboratorioColetaFilter').val() || [];
+    updateFilterDisplay('laboratorioColetaSelected', labsSelecionados, 'Laboratórios selecionados');
+
+    // Mês/Ano
+    const mesAnoSelecionados = $('#mesAnoFilter').val() || [];
+    updateFilterDisplay('mesAnoSelected', mesAnoSelecionados, 'Meses selecionados');
+
+    // Data
+    const dataSelecionada = document.getElementById('dataFilter').value;
+    const dataTexto = dataSelecionada ? [new Date(dataSelecionada).toLocaleDateString('pt-BR')] : [];
+    updateFilterDisplay('dataSelected', dataTexto, 'Data selecionada');
+
+    // Horários
+    const horariosSelecionados = $('#horarioFilter').val() || [];
+    updateFilterDisplay('horarioSelected', horariosSelecionados, 'Horários selecionados');
+}
+
+function updateFilterDisplay(containerId, selectedItems, labelText) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (selectedItems.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const truncatedItems = selectedItems.length > 3 
+        ? [...selectedItems.slice(0, 3), `+${selectedItems.length - 3} mais`]
+        : selectedItems;
+
+    container.innerHTML = `
+        <div class="text-xs text-gray-600 mt-1">
+            <span class="font-medium">${labelText}:</span>
+            <div class="flex flex-wrap gap-1 mt-1">
+                ${truncatedItems.map(item => `
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        ${item}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 function applyFilters() {
@@ -332,7 +391,6 @@ function parseDate(dateStr) {
     return null;
 }
 
-// CORREÇÃO: Função updateStats corrigida com atualização dos totais dos relatórios
 function updateStats() {
     const totalVagas = filteredData.length;
     // Vagas ocupadas são aquelas que têm nome do paciente preenchido (coluna F)
@@ -348,10 +406,6 @@ function updateStats() {
     document.getElementById('vagasOcupadas').textContent = vagasOcupadas.toLocaleString();
     document.getElementById('vagasLivres').textContent = vagasLivres.toLocaleString();
     document.getElementById('taxaOcupacao').textContent = taxaOcupacao;
-
-    // NOVO: Atualizar totais dos relatórios
-    document.getElementById('totalVagasUtilizadas').textContent = vagasOcupadas.toLocaleString();
-    document.getElementById('totalVagasLivresRelatorio').textContent = vagasLivres.toLocaleString();
 }
 
 Chart.register(ChartDataLabels);
@@ -586,7 +640,7 @@ function updateTable() {
     });
 }
 
-// CORREÇÃO PRINCIPAL: Tabelas de resumo corrigidas
+// FUNÇÃO CORRIGIDA: Tabelas de resumo COM TOTAIS
 function updateSummaryTables() {
     // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
@@ -601,7 +655,8 @@ function updateSummaryTables() {
             pacientesDiaUnidade[key] = (pacientesDiaUnidade[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tablePacientesDiaUnidade', Object.entries(pacientesDiaUnidade).sort((a, b) => b[1] - a[1]));
+    const totalPacientesDiaUnidade = updateSummaryTableWithTotal('tablePacientesDiaUnidade', Object.entries(pacientesDiaUnidade).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalPacientesDiaUnidade').textContent = totalPacientesDiaUnidade;
 
     // 2. Pacientes Agendados por Mês/Unidade (apenas com nome preenchido)
     const pacientesMesUnidade = {};
@@ -617,7 +672,8 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tablePacientesMesUnidade', Object.entries(pacientesMesUnidade).sort((a, b) => b[1] - a[1]));
+    const totalPacientesMesUnidade = updateSummaryTableWithTotal('tablePacientesMesUnidade', Object.entries(pacientesMesUnidade).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalPacientesMesUnidade').textContent = totalPacientesMesUnidade;
 
     // 3. Pacientes Agendados por Dia/Laboratório (apenas com nome preenchido)
     const pacientesDiaLab = {};
@@ -629,7 +685,8 @@ function updateSummaryTables() {
             pacientesDiaLab[key] = (pacientesDiaLab[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tablePacientesDiaLab', Object.entries(pacientesDiaLab).sort((a, b) => b[1] - a[1]));
+    const totalPacientesDiaLab = updateSummaryTableWithTotal('tablePacientesDiaLab', Object.entries(pacientesDiaLab).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalPacientesDiaLab').textContent = totalPacientesDiaLab;
 
     // 4. Pacientes Agendados por Mês/Laboratório (apenas com nome preenchido)
     const pacientesMesLab = {};
@@ -645,7 +702,8 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tablePacientesMesLab', Object.entries(pacientesMesLab).sort((a, b) => b[1] - a[1]));
+    const totalPacientesMesLab = updateSummaryTableWithTotal('tablePacientesMesLab', Object.entries(pacientesMesLab).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalPacientesMesLab').textContent = totalPacientesMesLab;
 
     // 5. Vagas Livres por Dia/Unidade (sem nome preenchido)
     const vagasLivresDiaUnidade = {};
@@ -657,7 +715,8 @@ function updateSummaryTables() {
             vagasLivresDiaUnidade[key] = (vagasLivresDiaUnidade[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tableVagasLivresDiaUnidade', Object.entries(vagasLivresDiaUnidade).sort((a, b) => b[1] - a[1]));
+    const totalVagasLivresDiaUnidade = updateSummaryTableWithTotal('tableVagasLivresDiaUnidade', Object.entries(vagasLivresDiaUnidade).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalVagasLivresDiaUnidade').textContent = totalVagasLivresDiaUnidade;
 
     // 6. Vagas Livres por Mês/Unidade (sem nome preenchido)
     const vagasLivresMesUnidade = {};
@@ -673,7 +732,8 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tableVagasLivresMesUnidade', Object.entries(vagasLivresMesUnidade).sort((a, b) => b[1] - a[1]));
+    const totalVagasLivresMesUnidade = updateSummaryTableWithTotal('tableVagasLivresMesUnidade', Object.entries(vagasLivresMesUnidade).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalVagasLivresMesUnidade').textContent = totalVagasLivresMesUnidade;
 
     // 7. Vagas Livres por Dia/Laboratório (sem nome preenchido)
     const vagasLivresDiaLab = {};
@@ -685,7 +745,8 @@ function updateSummaryTables() {
             vagasLivresDiaLab[key] = (vagasLivresDiaLab[key] || 0) + 1;
         }
     });
-    updateSummaryTable('tableVagasLivresDiaLab', Object.entries(vagasLivresDiaLab).sort((a, b) => b[1] - a[1]));
+    const totalVagasLivresDiaLab = updateSummaryTableWithTotal('tableVagasLivresDiaLab', Object.entries(vagasLivresDiaLab).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalVagasLivresDiaLab').textContent = totalVagasLivresDiaLab;
 
     // 8. Vagas Livres por Mês/Laboratório (sem nome preenchido)
     const vagasLivresMesLab = {};
@@ -701,7 +762,8 @@ function updateSummaryTables() {
             }
         }
     });
-    updateSummaryTable('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
+    const totalVagasLivresMesLab = updateSummaryTableWithTotal('tableVagasLivresMesLab', Object.entries(vagasLivresMesLab).sort((a, b) => b[1] - a[1]));
+    document.getElementById('totalVagasLivresMesLab').textContent = totalVagasLivresMesLab;
 }
 
 // Função auxiliar para verificar se há filtros ativos
@@ -716,7 +778,8 @@ function hasActiveFilters() {
            mesAnoFilter.length > 0 || dataFilter || horarioFilter.length > 0;
 }
 
-function updateSummaryTable(tableId, data) {
+// FUNÇÃO NOVA: Atualizar tabela de resumo com total
+function updateSummaryTableWithTotal(tableId, data) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     if (tableBody) {
         const total = data.reduce((sum, [key, value]) => sum + value, 0);
@@ -726,19 +789,18 @@ function updateSummaryTable(tableId, data) {
                 <td class="py-1 text-xs">${key}</td>
                 <td class="py-1 text-xs text-right font-semibold">${value}</td>
             </tr>
-        `).join('') + (total > 0 ? `
-            <tr class="border-t-2 border-gray-300 font-bold">
-                <td class="py-2 text-xs">Total</td>
-                <td class="py-2 text-xs text-right">${total}</td>
-            </tr>
-        ` : '');
+        `).join('');
+        
+        return total;
     }
+    return 0;
 }
 
 function clearFilters() {
     $('.filter-select').val(null).trigger('change');
     document.getElementById('dataFilter').value = '';
     applyFilters();
+    updateFilterDisplays();
 }
 
 // EXPORTAÇÃO CORRIGIDA: Sem nome do paciente e telefone
