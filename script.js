@@ -28,6 +28,12 @@ const LABORATORIO_POR_UNIDADE = {
     'Santa Cruz': 'Eldorado'
 };
 
+// Cores para os cards das unidades
+const CORES_UNIDADES = [
+    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 
+    'bg-yellow-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500'
+];
+
 // Função para atualizar a página
 function refreshPage() {
     location.reload();
@@ -411,9 +417,57 @@ function updateStats() {
 Chart.register(ChartDataLabels);
 
 function updateDashboard() {
+    updateVagasUnidadeCards(); // NOVA FUNÇÃO
     updateCharts();
     updateTable();
     updateSummaryTables();
+}
+
+// NOVA FUNÇÃO: Atualizar cards de vagas por unidade
+function updateVagasUnidadeCards() {
+    const container = document.getElementById('vagasUnidadeContainer');
+    if (!container) return;
+
+    // Determinar qual dataset usar baseado nos filtros ativos
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de vagas agendadas por unidade
+    const vagasPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
+    UNIDADES_SAUDE.forEach(unidade => {
+        vagasPorUnidade[unidade] = 0;
+    });
+    
+    // Contar todas as vagas (ocupadas + livres) por unidade
+    datasetBase.forEach(item => {
+        if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
+            vagasPorUnidade[item.unidadeSaude]++;
+        }
+    });
+
+    // Gerar HTML dos cards
+    const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
+        const total = vagasPorUnidade[unidade] || 0;
+        const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
+        
+        return `
+            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="stats-icon ${cor}">
+                        <i class="fas fa-hospital text-white"></i>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
+                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">vagas agendadas</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cardsHTML;
 }
 
 function updateCharts() {
