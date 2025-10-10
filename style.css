@@ -121,6 +121,27 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* NOVO: Estilo específico para o filtro Mês/Ano */
+.mes-ano-label {
+    display: block;
+    color: #dc2626 !important; /* Vermelho */
+    font-weight: bold !important; /* Negrito */
+    font-size: 16px !important; /* Ligeiramente maior */
+    margin-bottom: 8px;
+}
+
+.mes-ano-select {
+    border: 2px solid #87ceeb !important; /* Borda azul claro */
+    border-radius: 8px !important;
+    box-shadow: 0 0 8px rgba(135, 206, 235, 0.4) !important; /* Sombreamento azul claro */
+    transition: all 0.3s ease !important;
+}
+
+.mes-ano-select:focus {
+    box-shadow: 0 0 12px rgba(135, 206, 235, 0.6) !important; /* Sombreamento mais intenso no foco */
+    border-color: #5dade6 !important; /* Borda azul um pouco mais escura no foco */
+}
+
 /* NOVO: Estilo para exibição dos filtros selecionados */
 .selected-filters-display {
     min-height: 20px;
@@ -144,6 +165,18 @@ body {
 .select2-container--default .select2-selection--multiple:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* NOVO: Select2 customização específica para o filtro Mês/Ano */
+#mesAnoFilter + .select2-container .select2-selection--multiple {
+    border: 2px solid #87ceeb !important; /* Borda azul claro */
+    box-shadow: 0 0 8px rgba(135, 206, 235, 0.4) !important; /* Sombreamento azul claro */
+    transition: all 0.3s ease !important;
+}
+
+#mesAnoFilter + .select2-container .select2-selection--multiple:focus-within {
+    box-shadow: 0 0 12px rgba(135, 206, 235, 0.6) !important; /* Sombreamento mais intenso no foco */
+    border-color: #5dade6 !important; /* Borda azul um pouco mais escura no foco */
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
@@ -295,6 +328,11 @@ body {
         max-width: 80px;
         font-size: 10px;
     }
+    
+    /* Mobile: Ajustar tamanho do texto do filtro Mês/Ano */
+    .mes-ano-label {
+        font-size: 14px !important;
+    }
 }
 
 @media print {
@@ -346,3 +384,4 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
