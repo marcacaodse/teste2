@@ -32,7 +32,17 @@
                 <i class="fas fa-filter text-gray-600 mr-2"></i>
                 <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">29/09/2025</span></h3>
             </div>
-            
+
+            <!-- Filtro Mês/Ano -->
+                <div>
+                    <label class="mes-ano-label">Selecione o Período Mês/Ano</label>
+                    <select id="mesAnoFilter" class="filter-select mes-ano-select" multiple="multiple" style="width: 100%;">
+                        <!-- Opções serão preenchidas dinamicamente -->
+                    </select>
+                    <!-- Container para mostrar seleções -->
+                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
+                </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Filtro Unidades de Saúde -->
                 <div>
@@ -52,16 +62,6 @@
                     </select>
                     <!-- Container para mostrar seleções -->
                     <div id="laboratorioColetaSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-                <!-- Filtro Mês/Ano -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Mês/Ano:</label>
-                    <select id="mesAnoFilter" class="filter-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
                 </div>
 
                 <!-- Filtro Data -->
@@ -111,53 +111,53 @@
     <!-- Estatísticas de Vagas -->
     <div class="container mx-auto px-6 py-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <!-- Total de Vagas -->
+            <!-- Total de Vagas Por período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-blue-500">
                         <i class="fas fa-clipboard-list text-white"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total de Vagas</p>
+                        <p class="text-sm font-medium text-gray-600">Total de Vagas por Período</p>
                         <p class="text-3xl font-bold text-gray-900" id="totalVagas">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Vagas Ocupadas -->
+            <!-- Vagas Ocupadas por Período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-green-500">
                         <i class="fas fa-user-check text-white"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Vagas Ocupadas</p>
+                        <p class="text-sm font-medium text-gray-600">Vagas Ocupadas por Período</p>
                         <p class="text-3xl font-bold text-gray-900" id="vagasOcupadas">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Vagas Livres -->
+            <!-- Vagas Livres por Período-->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-gray-700">
                         <i class="fas fa-calendar-plus text-white"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Vagas Livres</p>
+                        <p class="text-sm font-medium text-gray-600">Vagas Livres por Período</p>
                         <p class="text-3xl font-bold text-gray-900" id="vagasLivres">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Taxa de Ocupação -->
+            <!-- Taxa de Ocupação por Período -->
             <div class="stats-card">
                 <div class="flex items-center">
                     <div class="stats-icon bg-purple-500">
                         <i class="fas fa-chart-pie text-white"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Taxa de Ocupação</p>
+                        <p class="text-sm font-medium text-gray-600">Taxa de Ocupação por Período</p>
                         <p class="text-3xl font-bold text-gray-900" id="taxaOcupacao">0.0%</p>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <!-- NOVA SEÇÃO: Total de Vagas Agendadas por Unidade -->
+    <!-- SEÇÃO: Total de Vagas Agendadas por Unidade -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -177,6 +177,21 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasUnidadeContainer">
             <!-- Cards das unidades serão inseridos dinamicamente via JavaScript -->
+        </div>
+    </div>
+
+    <!-- NOVA SEÇÃO: Total de Vagas Livres por Unidade -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                <i class="fas fa-calendar-plus mr-2 text-emerald-500"></i>
+                Total de Vagas Livres por Unidade
+            </h3>
+            <p class="text-sm text-gray-600">Quantidade total de vagas livres disponíveis em cada unidade de saúde</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasLivresUnidadeContainer">
+            <!-- Cards das unidades com vagas livres serão inseridos dinamicamente via JavaScript -->
         </div>
     </div>
 
@@ -213,7 +228,85 @@
         </div>
     </div>
 
-    <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) -->
+    <!-- NOVOS GRÁFICOS DE BARRAS VERTICAIS -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Novo Gráfico 1: Total de Pacientes Agendados por Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-users mr-2 text-green-600"></i>
+                        Total de Pacientes Agendados por Laboratório de Coleta conforme o Período
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Quantidade de pacientes com agendamento confirmado por laboratório</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartPacientesAgendadosLab"></canvas>
+                </div>
+            </div>
+
+            <!-- Novo Gráfico 2: Total de Vagas Livres por Laboratório -->
+            <div class="card">
+                <div class="p-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-calendar-check mr-2 text-blue-600"></i>
+                        Total de Vagas Livres por Laboratório de Coleta conforme o Período
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1">Quantidade de vagas disponíveis para agendamento por laboratório</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartVagasLivresLab"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRÁFICO CORRIGIDO: Linha do Tempo com Total de Vagas Disponibilizadas por Mês -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="card">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-chart-line mr-2 text-orange-500"></i>
+                    Evolução Temporal - Total de Vagas Disponibilizadas por Mês
+                </h3>
+                <p class="text-sm text-gray-600 mt-1">Evolução temporal do total geral de cotas/vagas disponibilizadas mês a mês (agendadas + livres)</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartVagasConcedidasTempo"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Principal - Todos os Agendamentos (SEM NOME E TELEFONE) -->
+    <div class="container mx-auto px-6 mb-6">
+        <div class="card">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-table mr-2 text-blue-500"></i>Todos os Agendamentos
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="agendamentosTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>UNIDADE DE SAÚDE</th>
+                            <th>DATA</th>
+                            <th>HORÁRIO</th>
+                            <th>Nº PRONTUÁRIO VIVVER</th>
+                            <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
+                            <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
+                            <th>LABORATÓRIO DE COLETA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) - MOVIDO PARA BAIXO DA TABELA PRINCIPAL -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -338,7 +431,7 @@
         </div>
     </div>
 
-    <!-- TABELAS: Vagas Livres (COM TOTAIS) -->
+    <!-- TABELAS: Vagas Livres (COM TOTAIS) - MOVIDO PARA BAIXO DAS VAGAS UTILIZADAS -->
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -461,35 +554,6 @@
         </div>
     </div>
 
-    <!-- Tabela Principal - Todos os Agendamentos (SEM NOME E TELEFONE) -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="card">
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-table mr-2 text-blue-500"></i>Todos os Agendamentos
-                </h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table id="agendamentosTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>UNIDADE DE SAÚDE</th>
-                            <th>DATA</th>
-                            <th>HORÁRIO</th>
-                            <th>Nº PRONTUÁRIO VIVVER</th>
-                            <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
-                            <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
-                            <th>LABORATÓRIO DE COLETA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dados serão inseridos via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Bibliotecas de Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -502,3 +566,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
