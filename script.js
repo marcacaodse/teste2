@@ -28,7 +28,7 @@ const LABORATORIO_POR_UNIDADE = {
     'Santa Cruz': 'Eldorado'
 };
 
-// Cores para os cards das unidades (agendadas )
+// Cores para os cards das unidades (agendadas)
 const CORES_UNIDADES = [
     'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 
     'bg-yellow-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500'
@@ -40,10 +40,10 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// Mapeamento de ícones específicos para cada unidade
+// CORREÇÃO: Mapeamento de ícones específicos para cada unidade - CORRIGIDO PARA FONTAWESOME
 const ICONES_UNIDADES = {
     'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-hospital', 
     'Unidade XV': 'fas fa-hospital',
     'Csu Eldorado': 'fas fa-hospital',
     'Novo Eldorado': 'fas fa-hospital',
@@ -51,6 +51,19 @@ const ICONES_UNIDADES = {
     'Santa Cruz': 'fas fa-hospital',
     'Perobas': 'fas fa-tree', // Ícone específico para Perobas
     'Parque São João': 'fas fa-leaf' // Ícone específico para Parque São João
+};
+
+// CORREÇÃO: Ícones para vagas livres - usando ícones diferentes dos agendados
+const ICONES_VAGAS_LIVRES = {
+    'Agua Branca': 'fas fa-calendar-plus',
+    'Jardim Bandeirantes': 'fas fa-calendar-plus',
+    'Unidade XV': 'fas fa-calendar-plus',
+    'Csu Eldorado': 'fas fa-calendar-plus',
+    'Novo Eldorado': 'fas fa-calendar-plus',
+    'Jardim Eldorado': 'fas fa-calendar-plus',
+    'Santa Cruz': 'fas fa-calendar-plus',
+    'Perobas': 'fas fa-tree', // Mantém o ícone específico
+    'Parque São João': 'fas fa-leaf' // Mantém o ícone específico
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
@@ -454,18 +467,23 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Ícones corrigidos
+// FUNÇÃO CORRIGIDA: updateVagasUnidadeCards - Garantindo que os ícones apareçam
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
 
+    // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
+    // Calcular total de vagas AGENDADAS (usando função central baseada na coluna F) por unidade
     const vagasPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
     UNIDADES_SAUDE.forEach(unidade => {
         vagasPorUnidade[unidade] = 0;
     });
     
+    // CORREÇÃO: Contar apenas as vagas AGENDADAS usando função central
     datasetBase.forEach(item => {
         if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
             if (isPacienteAgendado(item.nomePaciente)) {
@@ -474,11 +492,12 @@ function updateVagasUnidadeCards() {
         }
     });
 
+    // Gerar HTML dos cards com ícones corrigidos
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
         const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
         
-        // CORREÇÃO: Usar o ícone correto definido no mapeamento ICONES_UNIDADES
+        // CORREÇÃO: Usar os ícones corretos baseados no mapeamento
         const icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital';
         
         return `
@@ -500,18 +519,23 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Ícones corrigidos
+// FUNÇÃO CORRIGIDA: updateVagasLivresUnidadeCards - Garantindo que os ícones apareçam
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
 
+    // Determinar qual dataset usar baseado nos filtros ativos
     const datasetBase = hasActiveFilters() ? filteredData : allData;
     
+    // Calcular total de vagas LIVRES (usando função central baseada na coluna F) por unidade
     const vagasLivresPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
     UNIDADES_SAUDE.forEach(unidade => {
         vagasLivresPorUnidade[unidade] = 0;
     });
     
+    // Contar apenas as vagas LIVRES usando função central
     datasetBase.forEach(item => {
         if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
             if (isVagaLivre(item.nomePaciente)) {
@@ -520,12 +544,13 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
+    // Gerar HTML dos cards com ícones corrigidos
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
         const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
         
-        // CORREÇÃO: Usar o ícone correto definido no mapeamento ICONES_UNIDADES
-        const icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital';
+        // CORREÇÃO: Usar os ícones corretos baseados no mapeamento para vagas livres
+        const icone = ICONES_VAGAS_LIVRES[unidade] || 'fas fa-calendar-plus';
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
@@ -739,12 +764,6 @@ function updateChartPacientesAgendadosLab() {
             }
         }
     });
-
-    const dadosOrdenados = Object.entries(pacientesPorLab)
-        .sort((a, b) => b[1] - a[1]); // Ordem decrescente
-
-    const ctx = document.getElementById('chart
-// ... continuação do código anterior
 
     const dadosOrdenados = Object.entries(pacientesPorLab)
         .sort((a, b) => b[1] - a[1]); // Ordem decrescente
