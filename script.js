@@ -49,8 +49,9 @@ const ICONES_UNIDADES = {
     'Novo Eldorado': 'fas fa-hospital',
     'Jardim Eldorado': 'fas fa-hospital',
     'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital',
+    'Perobas': 'fas fa-tree',
+    'Parque São João': 'fas fa-leaf',
+    // outras unidades: 'fas fa-hospital'
 };
 
 // CORREÇÃO: Ícones para vagas livres - usando ícones diferentes dos agendados
@@ -62,8 +63,9 @@ const ICONES_VAGAS_LIVRES = {
     'Novo Eldorado': 'fas fa-calendar-plus',
     'Jardim Eldorado': 'fas fa-calendar-plus',
     'Santa Cruz': 'fas fa-calendar-plus',
-    'Perobas': 'fas fa-tree', // Mantém o ícone específico
-    'Parque São João': 'fas fa-leaf' // Mantém o ícone específico
+    'Perobas': 'fas fa-tree',
+    'Parque São João': 'fas fa-leaf',
+    // outras unidades: 'fas fa-calendar-plus'
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
