@@ -40,29 +40,30 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// CORREÇÃO: Mapeamento de ícones específicos para cada unidade - CORRIGIDO PARA FONTAWESOME
+// 🏥 Ícones para vagas agendadas
 const ICONES_UNIDADES = {
-    'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-hospital', 
-    'Unidade XV': 'fas fa-hospital',
-    'Csu Eldorado': 'fas fa-hospital',
-    'Novo Eldorado': 'fas fa-hospital',
-    'Jardim Eldorado': 'fas fa-hospital',
-    'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital'
+  'Agua Branca': 'fas fa-hospital',
+  'Jardim Bandeirantes': 'fas fa-hospital',
+  'Unidade XV': 'fas fa-hospital',
+  'Csu Eldorado': 'fas fa-hospital',
+  'Novo Eldorado': 'fas fa-hospital',
+  'Jardim Eldorado': 'fas fa-hospital',
+  'Santa Cruz': 'fas fa-hospital',
+  'Perobas': 'fas fa-tree',       // 🌳
+  'Parque São João': 'fas fa-leaf' // 🍃
 };
 
+// 📅 Ícones para vagas livres
 const ICONES_VAGAS_LIVRES = {
-    'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-hospital',
-    'Unidade XV': 'fas fa-hospital',
-    'Csu Eldorado': 'fas fa-hospital',
-    'Novo Eldorado': 'fas fa-hospital',
-    'Jardim Eldorado': 'fas fa-hospital',
-    'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital'
+  'Agua Branca': 'fas fa-calendar-plus',
+  'Jardim Bandeirantes': 'fas fa-calendar-plus',
+  'Unidade XV': 'fas fa-calendar-plus',
+  'Csu Eldorado': 'fas fa-calendar-plus',
+  'Novo Eldorado': 'fas fa-calendar-plus',
+  'Jardim Eldorado': 'fas fa-calendar-plus',
+  'Santa Cruz': 'fas fa-calendar-plus',
+  'Perobas': 'fas fa-tree',
+  'Parque São João': 'fas fa-leaf'
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
