@@ -42,29 +42,29 @@ const CORES_VAGAS_LIVRES = [
 
 // CORREÇÃO: Mapeamento de ícones específicos para cada unidade - CORRIGIDO PARA FONTAWESOME
 const ICONES_UNIDADES = {
-    'Agua Branca': 'fas fa-hospital';
-    'Jardim Bandeirantes': 'fas fa-hospital'; 
-    'Unidade XV': 'fas fa-hospital';
-    'Csu Eldorado': 'fas fa-hospital';
-    'Novo Eldorado': 'fas fa-hospital';
-    'Jardim Eldorado': 'fas fa-hospital';
-    'Santa Cruz': 'fas fa-hospital';
-    'Perobas': 'fas fa-hospital';
-    'Parque São João': 'fas fa-hospital';
+    'Agua Branca': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-hospital', 
+    'Unidade XV': 'fas fa-hospital',
+    'Csu Eldorado': 'fas fa-hospital',
+    'Novo Eldorado': 'fas fa-hospital',
+    'Jardim Eldorado': 'fas fa-hospital',
+    'Santa Cruz': 'fas fa-hospital',
+    'Perobas': 'fas fa-hospital',
+    'Parque São João': 'fas fa-hospital',
     // outras unidades: 'fas fa-hospital'
 };
 
 // CORREÇÃO: Ícones para vagas livres - usando ícones diferentes dos agendados
 const ICONES_VAGAS_LIVRES = {
-    'Agua Branca': 'fas fa-calendar-plus';
-    'Jardim Bandeirantes': 'fas fa-calendar-plus';
-    'Unidade XV': 'fas fa-calendar-plus';
-    'Csu Eldorado': 'fas fa-calendar-plus';
-    'Novo Eldorado': 'fas fa-calendar-plus';
-    'Jardim Eldorado': 'fas fa-calendar-plus';
-    'Santa Cruz': 'fas fa-calendar-plus';
-    'Perobas': 'fas fa-calendar-plus';
-    'Parque São João': 'fas fa-calendar-plus';
+    'Agua Branca': 'fas fa-calendar-plus',
+    'Jardim Bandeirantes': 'fas fa-calendar-plus',
+    'Unidade XV': 'fas fa-calendar-plus',
+    'Csu Eldorado': 'fas fa-calendar-plus',
+    'Novo Eldorado': 'fas fa-calendar-plus',
+    'Jardim Eldorado': 'fas fa-calendar-plus',
+    'Santa Cruz': 'fas fa-calendar-plus',
+    'Perobas': 'fas fa-calendar-plus',
+    'Parque São João': 'fas fa-calendar-plus',
     // outras unidades: 'fas fa-calendar-plus'
 };
 
