@@ -53,7 +53,6 @@ const ICONES_UNIDADES = {
     'Parque São João': 'fas fa-hospital'
 };
 
-// CORREÇÃO: Ícones para vagas livres - usando ícones diferentes dos agendados
 const ICONES_VAGAS_LIVRES = {
     'Agua Branca': 'fas fa-hospital',
     'Jardim Bandeirantes': 'fas fa-hospital',
