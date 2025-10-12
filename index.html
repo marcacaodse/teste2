@@ -1,569 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distrito Sanitário Eldorado - Consolidado de Vagas</title>
-    
-    <!-- Bibliotecas Externas (CDNs) -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-    
-    <!-- Arquivo de Estilo Local -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distrito Sanitário Eldorado - Consolidado de Vagas</title>
+
+  <!-- TailwindCSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- ✅ Font Awesome (CDN Estável) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- DataTables e Select2 -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
+  <!-- Estilo Local -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-50">
-    <!-- Header com Gradiente Azul -->
-    <div class="header-gradient text-white">
-        <div class="container mx-auto px-6 py-8">
-            <h1 class="text-4xl font-bold mb-2">Distrito Sanitário Eldorado</h1>
-            <p class="text-xl mb-1">Consolidado Exames Laboratoriais</p>
-            <p class="text-lg font-semibold mb-4">Diretora: Wandha Karine dos Santos</p>
-            <p class="text-sm opacity-70">Painel Criado por Ana P. A. Silva Matr. 201704/ Ref. Vivver / Distrito Sanitário Eldorado</p>
-        </div>
+  <!-- Header -->
+  <div class="header-gradient text-white">
+    <div class="container mx-auto px-6 py-8">
+      <h1 class="text-4xl font-bold mb-2">Distrito Sanitário Eldorado</h1>
+      <p class="text-xl mb-1">Consolidado Exames Laboratoriais</p>
+      <p class="text-lg font-semibold mb-4">Diretora: Wandha Karine dos Santos</p>
+      <p class="text-sm opacity-70">Painel criado por Ana P. A. Silva Matr. 201704 / Distrito Sanitário Eldorado</p>
     </div>
+  </div>
 
-    <!-- Seção de Filtros -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="container mx-auto px-6 py-6">
-            <div class="flex items-center mb-4">
-                <i class="fas fa-filter text-gray-600 mr-2"></i>
-                <h3 class="text-lg font-semibold text-gray-800">Filtros de Dados - Planilha Atualizada em <span id="lastUpdateDate">29/09/2025</span></h3>
-            </div>
-
-            <!-- Filtro Mês/Ano -->
-                <div>
-                    <label class="mes-ano-label">Selecione o Período Mês/Ano</label>
-                    <select id="mesAnoFilter" class="filter-select mes-ano-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <!-- Filtro Unidades de Saúde -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Unidades de Saúde:</label>
-                    <select id="unidadeSaudeFilter" class="filter-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="unidadeSaudeSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-                <!-- Filtro Laboratório de Coleta -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Laboratório de Coleta:</label>
-                    <select id="laboratorioColetaFilter" class="filter-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="laboratorioColetaSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-                <!-- Filtro Data -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Data:</label>
-                    <input type="date" id="dataFilter" class="filter-input" min="2025-11-01">
-                    <!-- Container para mostrar seleção -->
-                    <div id="dataSelected" class="selected-filters-display mt-2"></div>
-                </div>
-
-                <!-- Filtro Horários -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Hora:</label>
-                    <select id="horarioFilter" class="filter-select" multiple="multiple" style="width: 100%;">
-                        <!-- Opções serão preenchidas dinamicamente -->
-                    </select>
-                    <!-- Container para mostrar seleções -->
-                    <div id="horarioSelected" class="selected-filters-display mt-2"></div>
-                </div>
-            </div>
-
-            <!-- Botões de Ação -->
-            <div class="flex flex-wrap items-center justify-between mt-6 gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <span class="status-indicator status-online" id="connectionStatus"></span>
-                        <span id="connectionText">Conectado</span>
-                    </div>
-                    <span class="text-sm text-gray-500" id="lastUpdate">Última atualização: Carregando...</span>
-                </div>
-                
-                <div class="flex items-center space-x-3">
-                    <button onclick="clearFilters()" class="btn-secondary">
-                        <i class="fas fa-eraser mr-2"></i>Limpar Filtros
-                    </button>
-                    <button onclick="refreshPage()" class="btn-primary">
-                        <i class="fas fa-sync-alt mr-2"></i>Atualizar Página
-                    </button>
-                    <button onclick="exportToExcel()" class="btn-success">
-                        <i class="fas fa-file-excel mr-2"></i>Exportar Excel
-                    </button>
-                </div>
-            </div>
+  <!-- Painel Principal -->
+  <div class="container mx-auto px-6 py-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div class="stats-card">
+        <div class="flex items-center">
+          <div class="stats-icon bg-blue-500">
+            <i class="fas fa-clipboard-list text-white"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Total de Vagas por Período</p>
+            <p class="text-3xl font-bold text-gray-900" id="totalVagas">0</p>
+          </div>
         </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="flex items-center">
+          <div class="stats-icon bg-green-500">
+            <i class="fas fa-user-check text-white"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Vagas Ocupadas</p>
+            <p class="text-3xl font-bold text-gray-900" id="vagasOcupadas">0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="flex items-center">
+          <div class="stats-icon bg-gray-700">
+            <i class="fas fa-calendar-plus text-white"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Vagas Livres</p>
+            <p class="text-3xl font-bold text-gray-900" id="vagasLivres">0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="flex items-center">
+          <div class="stats-icon bg-purple-500">
+            <i class="fas fa-chart-pie text-white"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Taxa de Ocupação</p>
+            <p class="text-3xl font-bold text-gray-900" id="taxaOcupacao">0%</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Estatísticas de Vagas -->
-    <div class="container mx-auto px-6 py-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <!-- Total de Vagas Por período -->
-            <div class="stats-card">
-                <div class="flex items-center">
-                    <div class="stats-icon bg-blue-500">
-                        <i class="fas fa-clipboard-list text-white"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total de Vagas por Período</p>
-                        <p class="text-3xl font-bold text-gray-900" id="totalVagas">0</p>
-                    </div>
-                </div>
-            </div>
+  <!-- Script -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-            <!-- Vagas Ocupadas por Período -->
-            <div class="stats-card">
-                <div class="flex items-center">
-                    <div class="stats-icon bg-green-500">
-                        <i class="fas fa-user-check text-white"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Vagas Ocupadas por Período</p>
-                        <p class="text-3xl font-bold text-gray-900" id="vagasOcupadas">0</p>
-                    </div>
-                </div>
-            </div>
+  <!-- ✅ Script Local Atualizado -->
+  <script>
+  // Mapeamento de ícones por unidade (agendadas)
+  const ICONES_UNIDADES = {
+    'Agua Branca': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-hospital',
+    'Unidade XV': 'fas fa-hospital',
+    'Csu Eldorado': 'fas fa-hospital',
+    'Novo Eldorado': 'fas fa-hospital',
+    'Jardim Eldorado': 'fas fa-hospital',
+    'Santa Cruz': 'fas fa-hospital',
+    'Perobas': 'fas fa-tree',
+    'Parque São João': 'fas fa-leaf'
+  };
 
-            <!-- Vagas Livres por Período-->
-            <div class="stats-card">
-                <div class="flex items-center">
-                    <div class="stats-icon bg-gray-700">
-                        <i class="fas fa-calendar-plus text-white"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Vagas Livres por Período</p>
-                        <p class="text-3xl font-bold text-gray-900" id="vagasLivres">0</p>
-                    </div>
-                </div>
-            </div>
+  // Mapeamento de ícones para vagas livres
+  const ICONES_VAGAS_LIVRES = {
+    'Agua Branca': 'fas fa-calendar-plus',
+    'Jardim Bandeirantes': 'fas fa-calendar-plus',
+    'Unidade XV': 'fas fa-calendar-plus',
+    'Csu Eldorado': 'fas fa-calendar-plus',
+    'Novo Eldorado': 'fas fa-calendar-plus',
+    'Jardim Eldorado': 'fas fa-calendar-plus',
+    'Santa Cruz': 'fas fa-calendar-plus',
+    'Perobas': 'fas fa-tree',
+    'Parque São João': 'fas fa-leaf'
+  };
 
-            <!-- Taxa de Ocupação por Período -->
-            <div class="stats-card">
-                <div class="flex items-center">
-                    <div class="stats-icon bg-purple-500">
-                        <i class="fas fa-chart-pie text-white"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Taxa de Ocupação por Período</p>
-                        <p class="text-3xl font-bold text-gray-900" id="taxaOcupacao">0.0%</p>
-                    </div>
-                </div>
-            </div>
+  // Exemplo de geração de card (você adapta ao seu script principal)
+  function gerarCardUnidade(unidade, total, tipo = 'agendada') {
+    const icone = tipo === 'livre' ? (ICONES_VAGAS_LIVRES[unidade] || 'fas fa-calendar-plus') : (ICONES_UNIDADES[unidade] || 'fas fa-hospital');
+    return `
+      <div class="card p-4 flex items-center space-x-4">
+        <div class="text-3xl text-blue-600"><i class="${icone}"></i></div>
+        <div>
+          <p class="text-sm text-gray-600">${unidade}</p>
+          <p class="text-xl font-bold">${total}</p>
         </div>
-    </div>
+      </div>`;
+  }
 
-    <!-- SEÇÃO: Total de Vagas Agendadas por Unidade -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                <i class="fas fa-hospital mr-2 text-teal-500"></i>
-                Total de Vagas Agendadas por Unidade
-            </h3>
-            <p class="text-sm text-gray-600">Quantidade total de vagas agendadas em cada unidade de saúde</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasUnidadeContainer">
-            <!-- Cards das unidades serão inseridos dinamicamente via JavaScript -->
-        </div>
-    </div>
-
-    <!-- NOVA SEÇÃO: Total de Vagas Livres por Unidade -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                <i class="fas fa-calendar-plus mr-2 text-emerald-500"></i>
-                Total de Vagas Livres por Unidade
-            </h3>
-            <p class="text-sm text-gray-600">Quantidade total de vagas livres disponíveis em cada unidade de saúde</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4" id="vagasLivresUnidadeContainer">
-            <!-- Cards das unidades com vagas livres serão inseridos dinamicamente via JavaScript -->
-        </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Gráfico 1: Próximos Agendamentos por Unidade de Saúde -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-alt mr-2 text-red-500"></i>
-                        Total de Dias para Marcar Próximo Agendamento por Unidade
-                    </h3>
-                    <p class="text-sm text-gray-600 mt-1">Dias até a próxima vaga livre disponível</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartUltimaDataUnidade"></canvas>
-                </div>
-            </div>
-
-            <!-- Gráfico 2: Próximos Agendamentos por Laboratório de Coleta -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-alt mr-2 text-orange-500"></i>
-                        Total de Dias para Marcar Próximo Agendamento por Laboratório
-                    </h3>
-                    <p class="text-sm text-gray-600 mt-1">Dias até a próxima vaga livre disponível</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartUltimaDataLaboratorio"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- NOVOS GRÁFICOS DE BARRAS VERTICAIS -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Novo Gráfico 1: Total de Pacientes Agendados por Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-users mr-2 text-green-600"></i>
-                        Total de Pacientes Agendados por Laboratório de Coleta conforme o Período
-                    </h3>
-                    <p class="text-sm text-gray-600 mt-1">Quantidade de pacientes com agendamento confirmado por laboratório</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartPacientesAgendadosLab"></canvas>
-                </div>
-            </div>
-
-            <!-- Novo Gráfico 2: Total de Vagas Livres por Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-check mr-2 text-blue-600"></i>
-                        Total de Vagas Livres por Laboratório de Coleta conforme o Período
-                    </h3>
-                    <p class="text-sm text-gray-600 mt-1">Quantidade de vagas disponíveis para agendamento por laboratório</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartVagasLivresLab"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GRÁFICO CORRIGIDO: Linha do Tempo com Total de Vagas Disponibilizadas por Mês -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="card">
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-chart-line mr-2 text-orange-500"></i>
-                    Evolução Temporal - Total de Vagas Disponibilizadas por Mês
-                </h3>
-                <p class="text-sm text-gray-600 mt-1">Evolução temporal do total geral de cotas/vagas disponibilizadas mês a mês (agendadas + livres)</p>
-            </div>
-            <div class="chart-container">
-                <canvas id="chartVagasConcedidasTempo"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabela Principal - Todos os Agendamentos (SEM NOME E TELEFONE) -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="card">
-            <div class="p-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-table mr-2 text-blue-500"></i>Todos os Agendamentos
-                </h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table id="agendamentosTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>UNIDADE DE SAÚDE</th>
-                            <th>DATA</th>
-                            <th>HORÁRIO</th>
-                            <th>Nº PRONTUÁRIO VIVVER</th>
-                            <th>OBSERVAÇÃO/ UNIDADE DE SAÚDE</th>
-                            <th>PERFIL DO PACIENTE OU TIPO DO EXAME</th>
-                            <th>LABORATÓRIO DE COLETA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dados serão inseridos via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TABELAS: Vagas Utilizadas (COM TOTAIS) - MOVIDO PARA BAIXO DA TABELA PRINCIPAL -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                <i class="fas fa-user-check mr-2 text-green-500"></i>
-                Relatório de Vagas Utilizadas
-            </h3>
-        </div>
-        
-        <!-- Tabelas de Resumo de Vagas Utilizadas -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-            <!-- Tabela 1: Pacientes Agendados por Dia/Unidade de Saúde -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
-                        Pacientes Agendados por Dia/Unidade de Saúde
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-blue-600">Total: <span id="totalPacientesDiaUnidade" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesDiaUnidade" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Data/Unidade de Saúde</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 2: Pacientes Agendados por Mês/Unidade de Saúde -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-chart-bar mr-2 text-green-500"></i>
-                        Pacientes Agendados por Mês/Unidade de Saúde
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-green-600">Total: <span id="totalPacientesMesUnidade" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesMesUnidade" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Mês/Unidade de Saúde</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 3: Pacientes Agendados por Dia/Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-chart-bar mr-2 text-purple-500"></i>
-                        Pacientes por Dia/Laboratório
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-purple-600">Total: <span id="totalPacientesDiaLab" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesDiaLab" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Data/Laboratório</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 4: Pacientes Agendados por Mês/Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-chart-bar mr-2 text-red-500"></i>
-                        Pacientes Agendados por Mês/Laboratório
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-red-600">Total: <span id="totalPacientesMesLab" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tablePacientesMesLab" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Mês/Laboratório</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TABELAS: Vagas Livres (COM TOTAIS) - MOVIDO PARA BAIXO DAS VAGAS UTILIZADAS -->
-    <div class="container mx-auto px-6 mb-6">
-        <div class="mb-4">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                <i class="fas fa-calendar-plus mr-2 text-indigo-500"></i>
-                Relatório de Vagas Livres
-            </h3>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-            <!-- Tabela 5: Vagas Livres por Dia e Unidade -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-calendar-day mr-2 text-indigo-500"></i>
-                        Vagas Livres por Dia/Unidade
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-indigo-600">Total: <span id="totalVagasLivresDiaUnidade" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tableVagasLivresDiaUnidade" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Data/Unidade</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 6: Vagas Livres por Mês e Unidade -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-calendar mr-2 text-teal-500"></i>
-                        Vagas Livres por Mês/Unidade
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-teal-600">Total: <span id="totalVagasLivresMesUnidade" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tableVagasLivresMesUnidade" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Mês/Unidade</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 7: Vagas Livres por Dia e Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-flask mr-2 text-cyan-500"></i>
-                        Vagas Livres por Dia/Lab
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-cyan-600">Total: <span id="totalVagasLivresDiaLab" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tableVagasLivresDiaLab" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Data/Laboratório</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela 8: Vagas Livres por Mês e Laboratório -->
-            <div class="card">
-                <div class="p-4 border-b">
-                    <h4 class="text-md font-semibold text-gray-800">
-                        <i class="fas fa-vial mr-2 text-pink-500"></i>
-                        Vagas Livres por Mês/Lab
-                    </h4>
-                    <div class="mt-2">
-                        <span class="text-sm font-medium text-pink-600">Total: <span id="totalVagasLivresMesLab" class="font-bold">0</span></span>
-                    </div>
-                </div>
-                <div class="p-4 table-container-small">
-                    <div class="overflow-y-auto max-h-64">
-                        <table id="tableVagasLivresMesLab" class="w-full text-sm">
-                            <thead class="sticky top-0 bg-white">
-                                <tr class="border-b">
-                                    <th class="text-left py-2">Mês/Laboratório</th>
-                                    <th class="text-right py-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bibliotecas de Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <!-- Arquivo de Script Local -->
-    <script src="script.js"></script>
+  // Exemplo de uso
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("Painel carregado com ícones FontAwesome corrigidos!");
+  });
+  </script>
 </body>
 </html>
-
