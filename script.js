@@ -49,8 +49,8 @@ const ICONES_UNIDADES = {
     'Novo Eldorado': 'fas fa-hospital',
     'Jardim Eldorado': 'fas fa-hospital',
     'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-tree',
-    'Parque São João': 'fas fa-leaf',
+    'Perobas': 'fas fa-hospital',
+    'Parque São João': 'fas fa-hospital',
     // outras unidades: 'fas fa-hospital'
 };
 
@@ -63,8 +63,8 @@ const ICONES_VAGAS_LIVRES = {
     'Novo Eldorado': 'fas fa-calendar-plus',
     'Jardim Eldorado': 'fas fa-calendar-plus',
     'Santa Cruz': 'fas fa-calendar-plus',
-    'Perobas': 'fas fa-tree',
-    'Parque São João': 'fas fa-leaf',
+    'Perobas': 'fas fa-calendar-plus',
+    'Parque São João': 'fas fa-calendar-plus',
     // outras unidades: 'fas fa-calendar-plus'
 };
 
