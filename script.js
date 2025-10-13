@@ -80,25 +80,6 @@ function isVagaLivre(nomePaciente) {
     return !isPacienteAgendado(nomePaciente);
 }
 
-// Função para criar card de unidade
-function criarCardUnidade(nomeUnidade, quantidadeVagas, tipo = 'agendadas') {
-    const icone = ICONES_UNIDADES[nomeUnidade] || 'fas fa-hospital';
-    const cor = CORES_UNIDADES[nomeUnidade] || 'bg-teal-500';
-    
-    return `
-        <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-            <div class="flex items-center mb-2">
-                <div class="${cor} text-white p-3 rounded-lg">
-                    <i class="${icone} text-2xl"></i>
-                </div>
-            </div>
-            <h4 class="text-lg font-semibold text-gray-700 mb-1">${nomeUnidade}</h4>
-            <div class="text-3xl font-bold text-gray-900">${quantidadeVagas}</div>
-            <p class="text-sm text-gray-500">vagas ${tipo}</p>
-        </div>
-    `;
-}
-
 // Função para atualizar a página
 function refreshPage() {
     location.reload();
