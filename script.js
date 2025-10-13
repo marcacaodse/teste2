@@ -40,32 +40,133 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// CORREÇÃO: Mapeamento de ícones específicos para cada unidade - CORRIGIDO PARA FONTAWESOME
+// Mapeamento ATUALIZADO de ícones específicos para cada unidade (Google Material Icons)
 const ICONES_UNIDADES = {
-    'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-hospital', 
-    'Unidade XV': 'fas fa-hospital',
-    'Csu Eldorado': 'fas fa-hospital',
-    'Novo Eldorado': 'fas fa-hospital',
-    'Jardim Eldorado': 'fas fa-hospital',
-    'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital',
-    // outras unidades: 'fas fa-hospital'
+    'Agua Branca': 'local_hospital',
+    'Jardim Bandeirantes': 'local_hospital', 
+    'Unidade XV': 'local_hospital',
+    'Csu Eldorado': 'local_hospital',
+    'Novo Eldorado': 'local_hospital',
+    'Jardim Eldorado': 'local_hospital',
+    'Santa Cruz': 'local_hospital',
+    'Perobas': 'park', // Ícone específico para Perobas (árvore/parque)
+    'Parque São João': 'nature' // Ícone específico para Parque São João (natureza)
 };
 
-// CORREÇÃO: Ícones para vagas livres - usando ícones diferentes dos agendados
-const ICONES_VAGAS_LIVRES = {
-    'Agua Branca': 'fas fa-calendar-plus',
-    'Jardim Bandeirantes': 'fas fa-calendar-plus',
-    'Unidade XV': 'fas fa-calendar-plus',
-    'Csu Eldorado': 'fas fa-calendar-plus',
-    'Novo Eldorado': 'fas fa-calendar-plus',
-    'Jardim Eldorado': 'fas fa-calendar-plus',
-    'Santa Cruz': 'fas fa-calendar-plus',
-    'Perobas': 'fas fa-calendar-plus',
-    'Parque São João': 'fas fa-calendar-plus',
-    // outras unidades: 'fas fa-calendar-plus'
+// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Com Google Material Icons
+function updateVagasUnidadeCards() {
+    const container = document.getElementById('vagasUnidadeContainer');
+    if (!container) return;
+
+    // Determinar qual dataset usar baseado nos filtros ativos
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de vagas AGENDADAS (usando função central baseada na coluna F) por unidade
+    const vagasPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
+    UNIDADES_SAUDE.forEach(unidade => {
+        vagasPorUnidade[unidade] = 0;
+    });
+    
+    // CORREÇÃO: Contar apenas as vagas AGENDADAS usando função central
+    datasetBase.forEach(item => {
+        if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
+            if (isPacienteAgendado(item.nomePaciente)) {
+                vagasPorUnidade[item.unidadeSaude]++;
+            }
+        }
+    });
+
+    // Gerar HTML dos cards com Google Material Icons
+    const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
+        const total = vagasPorUnidade[unidade] || 0;
+        const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
+        
+        // MODIFICAÇÃO: Usar Google Material Icons com ícones específicos
+        let icone;
+        if (unidade === 'Perobas' || unidade === 'Parque São João') {
+            icone = 'event_available'; // Ícone de calendário disponível
+        } else {
+            icone = ICONES_UNIDADES[unidade] || 'local_hospital'; // Ícones específicos ou padrão hospital
+        }
+        
+        return `
+            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="stats-icon ${cor}">
+                        <span class="material-symbols-outlined text-white">${icone}</span>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
+                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">vagas agendadas</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cardsHTML;
+}
+
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Com Google Material Icons
+function updateVagasLivresUnidadeCards() {
+    const container = document.getElementById('vagasLivresUnidadeContainer');
+    if (!container) return;
+
+    // Determinar qual dataset usar baseado nos filtros ativos
+    const datasetBase = hasActiveFilters() ? filteredData : allData;
+    
+    // Calcular total de vagas LIVRES (usando função central baseada na coluna F) por unidade
+    const vagasLivresPorUnidade = {};
+    
+    // Inicializar todas as unidades com 0
+    UNIDADES_SAUDE.forEach(unidade => {
+        vagasLivresPorUnidade[unidade] = 0;
+    });
+    
+    // Contar apenas as vagas LIVRES usando função central
+    datasetBase.forEach(item => {
+        if (item.unidadeSaude && UNIDADES_SAUDE.includes(item.unidadeSaude)) {
+            if (isVagaLivre(item.nomePaciente)) {
+                vagasLivresPorUnidade[item.unidadeSaude]++;
+            }
+        }
+    });
+
+    // Gerar HTML dos cards com Google Material Icons
+    const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
+        const total = vagasLivresPorUnidade[unidade] || 0;
+        const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
+        
+        // MODIFICAÇÃO: Usar Google Material Icons com ícones específicos das outras unidades
+        let icone;
+        if (unidade === 'Perobas') {
+            icone = 'park'; // Ícone específico do Perobas (parque)
+        } else if (unidade === 'Parque São João') {
+            icone = 'nature'; // Ícone específico do Parque São João (natureza)
+        } else {
+            icone = 'local_hospital'; // Ícones das outras unidades (hospital)
+        }
+        
+        return `
+            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="stats-icon ${cor}">
+                        <span class="material-symbols-outlined text-white">${icone}</span>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
+                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">vagas livres</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cardsHTML;
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
