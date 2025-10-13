@@ -40,17 +40,30 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// Mapeamento de ícones específicos para cada unidade
+// Mapeamento de ícones específicos para cada unidade com mais variedade
 const ICONES_UNIDADES = {
     'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-hospital',
-    'Unidade XV': 'fas fa-hospital',
-    'Csu Eldorado': 'fas fa-hospital',
-    'Novo Eldorado': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-clinic-medical',
+    'Unidade XV': 'fas fa-hospital-alt',
+    'Csu Eldorado': 'fas fa-hospital-user',
+    'Novo Eldorado': 'fas fa-house-medical',
     'Jardim Eldorado': 'fas fa-hospital',
-    'Santa Cruz': 'fas fa-hospital',
+    'Santa Cruz': 'fas fa-briefcase-medical',
     'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital',
+    'Parque São João': 'fas fa-hospital-symbol',
+};
+
+// Cores específicas para cada unidade (opcional)
+const CORES_UNIDADES = {
+    'Agua Branca': 'bg-blue-500',
+    'Jardim Bandeirantes': 'bg-green-500',
+    'Unidade XV': 'bg-purple-500',
+    'Csu Eldorado': 'bg-red-500',
+    'Novo Eldorado': 'bg-orange-500',
+    'Jardim Eldorado': 'bg-blue-500',
+    'Santa Cruz': 'bg-pink-500',
+    'Perobas': 'bg-teal-500',
+    'Parque São João': 'bg-indigo-500',
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
@@ -65,6 +78,25 @@ function isPacienteAgendado(nomePaciente) {
 // FUNÇÃO CENTRAL: Verificar se uma vaga está livre baseado na coluna F
 function isVagaLivre(nomePaciente) {
     return !isPacienteAgendado(nomePaciente);
+}
+
+// Função para criar card de unidade
+function criarCardUnidade(nomeUnidade, quantidadeVagas, tipo = 'agendadas') {
+    const icone = ICONES_UNIDADES[nomeUnidade] || 'fas fa-hospital';
+    const cor = CORES_UNIDADES[nomeUnidade] || 'bg-teal-500';
+    
+    return `
+        <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+            <div class="flex items-center mb-2">
+                <div class="${cor} text-white p-3 rounded-lg">
+                    <i class="${icone} text-2xl"></i>
+                </div>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-700 mb-1">${nomeUnidade}</h4>
+            <div class="text-3xl font-bold text-gray-900">${quantidadeVagas}</div>
+            <p class="text-sm text-gray-500">vagas ${tipo}</p>
+        </div>
+    `;
 }
 
 // Função para atualizar a página
