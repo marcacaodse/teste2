@@ -49,8 +49,8 @@ const ICONES_UNIDADES = {
     'Novo Eldorado': 'local_hospital',
     'Jardim Eldorado': 'local_hospital',
     'Santa Cruz': 'local_hospital',
-    'Perobas': 'park', // Ícone específico para Perobas (parque)
-    'Parque São João': 'nature' // Ícone específico para Parque São João (natureza)
+    'Perobas': 'local_hospital',
+    'Parque São João': 'local_hospital'
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
