@@ -40,17 +40,17 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// ATUALIZADO: Mapeamento de ícones específicos para cada unidade (Google Material Icons)
+// Mapeamento de ícones específicos para cada unidade
 const ICONES_UNIDADES = {
-    'Agua Branca': 'local_hospital',
-    'Jardim Bandeirantes': 'local_hospital',
-    'Unidade XV': 'local_hospital',
-    'Csu Eldorado': 'local_hospital',
-    'Novo Eldorado': 'local_hospital',
-    'Jardim Eldorado': 'local_hospital',
-    'Santa Cruz': 'local_hospital',
-    'Perobas': 'local_hospital',
-    'Parque São João': 'local_hospital'
+    'Agua Branca': 'fas fa-hospital',
+    'Jardim Bandeirantes': 'fas fa-hospital',
+    'Unidade XV': 'fas fa-hospital',
+    'Csu Eldorado': 'fas fa-hospital',
+    'Novo Eldorado': 'fas fa-hospital',
+    'Jardim Eldorado': 'fas fa-hospital',
+    'Santa Cruz': 'fas fa-hospital',
+    'Perobas': 'fas fa-tree', // Ícone específico para Perobas
+    'Parque São João': 'fas fa-leaf' // Ícone específico para Parque São João
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
@@ -454,7 +454,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Com Google Material Icons
+// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Perobas e Parque São João usam ícone de calendário
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -479,24 +479,24 @@ function updateVagasUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com Google Material Icons
+    // Gerar HTML dos cards com ícones modificados conforme solicitação
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
         const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
         
-        // MODIFICAÇÃO: Perobas e Parque São João usam ícone de calendário
+        // MODIFICAÇÃO: Perobas e Parque São João usam ícone de calendário (que estava nas vagas livres)
         let icone;
         if (unidade === 'Perobas' || unidade === 'Parque São João') {
-            icone = 'event_available'; // Ícone de calendário disponível
+            icone = 'fas fa-calendar-plus'; // Ícone que estava nas vagas livres
         } else {
-            icone = ICONES_UNIDADES[unidade] || 'local_hospital'; // Ícones originais para outras unidades
+            icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital'; // Ícones originais para outras unidades
         }
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="stats-icon ${cor}">
-                        <span class="material-symbols-outlined text-white">${icone}</span>
+                        <i class="${icone} text-white"></i>
                     </div>
                     <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
@@ -511,7 +511,7 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Com Google Material Icons
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Usar ícones específicos das outras unidades
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
@@ -536,7 +536,7 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com Google Material Icons
+    // Gerar HTML dos cards com ícones modificados conforme solicitação
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
         const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
@@ -544,18 +544,18 @@ function updateVagasLivresUnidadeCards() {
         // MODIFICAÇÃO: Usar ícones específicos que estavam nas vagas agendadas
         let icone;
         if (unidade === 'Perobas') {
-            icone = 'park'; // Ícone específico do Perobas que estava nas vagas agendadas
+            icone = 'fas fa-tree'; // Ícone específico do Perobas que estava nas vagas agendadas
         } else if (unidade === 'Parque São João') {
-            icone = 'nature'; // Ícone específico do Parque São João que estava nas vagas agendadas
+            icone = 'fas fa-leaf'; // Ícone específico do Parque São João que estava nas vagas agendadas
         } else {
-            icone = 'local_hospital'; // Ícones das outras unidades que estavam nas vagas agendadas
+            icone = 'fas fa-hospital'; // Ícones das outras unidades que estavam nas vagas agendadas
         }
         
         return `
             <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="stats-icon ${cor}">
-                        <span class="material-symbols-outlined text-white">${icone}</span>
+                        <i class="${icone} text-white"></i>
                     </div>
                     <div class="ml-4 flex-1">
                         <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
@@ -1235,3 +1235,5 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     setInterval(loadData, 600000); // Auto-atualização a cada 10 minutos
 });
+
+
