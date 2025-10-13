@@ -49,8 +49,8 @@ const ICONES_UNIDADES = {
     'Novo Eldorado': 'fas fa-hospital',
     'Jardim Eldorado': 'fas fa-hospital',
     'Santa Cruz': 'fas fa-hospital',
-    'Perobas': 'fas fa-tree', // Ícone específico para Perobas
-    'Parque São João': 'fas fa-tree', // Ícone específico para Parque São João
+    'Perobas': 'fas fa-hospital',
+    'Parque São João': 'fas fa-hospital',
 };
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
