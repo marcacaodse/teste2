@@ -64,7 +64,7 @@ const CORES_UNIDADES = {
     'Santa Cruz': 'bg-pink-500',
     'Perobas': 'bg-teal-500',
     'Parque São João': 'bg-indigo-500',
-};
+}
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
 function isPacienteAgendado(nomePaciente) {
