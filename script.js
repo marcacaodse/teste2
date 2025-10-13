@@ -50,7 +50,7 @@ const ICONES_UNIDADES = {
     'Jardim Eldorado': 'fas fa-hospital',
     'Santa Cruz': 'fas fa-briefcase-medical',
     'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital-symbol',
+    'Parque São João': 'fas fa-hospital-symbol'
 };
 
 // Cores específicas para cada unidade (opcional)
@@ -63,8 +63,8 @@ const CORES_UNIDADES = {
     'Jardim Eldorado': 'bg-blue-500',
     'Santa Cruz': 'bg-pink-500',
     'Perobas': 'bg-teal-500',
-    'Parque São João': 'bg-indigo-500',
-}
+    'Parque São João': 'bg-indigo-500'
+};
 
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
 function isPacienteAgendado(nomePaciente) {
