@@ -7,10 +7,7 @@
     
     <!-- Bibliotecas Externas (CDNs) -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome - ATUALIZADO PARA A VERSÃO MAIS RECENTE -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     
@@ -37,22 +34,19 @@
             </div>
 
             <!-- Filtro Mês/Ano -->
-            <div class="mb-4">
-                <label class="mes-ano-label block text-sm font-medium text-gray-700 mb-2">Selecione o Período Mês/Ano</label>
-                <select id="mesAnoFilter" class="filter-select mes-ano-select" multiple="multiple" style="width: 100%;">
-                    <!-- Opções serão preenchidas dinamicamente -->
-                </select>
-                <!-- Container para mostrar seleções -->
-                <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
-            </div>
+                <div>
+                    <label class="mes-ano-label">Selecione o Período Mês/Ano</label>
+                    <select id="mesAnoFilter" class="filter-select mes-ano-select" multiple="multiple" style="width: 100%;">
+                        <!-- Opções serão preenchidas dinamicamente -->
+                    </select>
+                    <!-- Container para mostrar seleções -->
+                    <div id="mesAnoSelected" class="selected-filters-display mt-2"></div>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Filtro Unidades de Saúde -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-hospital-alt mr-1 text-blue-500"></i>
-                        Unidades de Saúde:
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Unidades de Saúde:</label>
                     <select id="unidadeSaudeFilter" class="filter-select" multiple="multiple" style="width: 100%;">
                         <!-- Opções serão preenchidas dinamicamente -->
                     </select>
@@ -62,10 +56,7 @@
 
                 <!-- Filtro Laboratório de Coleta -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-flask mr-1 text-purple-500"></i>
-                        Laboratório de Coleta:
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Laboratório de Coleta:</label>
                     <select id="laboratorioColetaFilter" class="filter-select" multiple="multiple" style="width: 100%;">
                         <!-- Opções serão preenchidas dinamicamente -->
                     </select>
@@ -75,10 +66,7 @@
 
                 <!-- Filtro Data -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-calendar mr-1 text-green-500"></i>
-                        Data:
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Data:</label>
                     <input type="date" id="dataFilter" class="filter-input" min="2025-11-01">
                     <!-- Container para mostrar seleção -->
                     <div id="dataSelected" class="selected-filters-display mt-2"></div>
@@ -86,10 +74,7 @@
 
                 <!-- Filtro Horários -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-clock mr-1 text-orange-500"></i>
-                        Hora:
-                    </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Hora:</label>
                     <select id="horarioFilter" class="filter-select" multiple="multiple" style="width: 100%;">
                         <!-- Opções serão preenchidas dinamicamente -->
                     </select>
@@ -125,7 +110,7 @@
 
     <!-- Estatísticas de Vagas -->
     <div class="container mx-auto px-6 py-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <!-- Total de Vagas Por período -->
             <div class="stats-card">
                 <div class="flex items-center">
@@ -199,7 +184,7 @@
     <div class="container mx-auto px-6 mb-6">
         <div class="mb-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                <i class="fas fa-calendar-check mr-2 text-teal-500"></i>
+                <i class="fas fa-calendar-plus mr-2 text-emerald-500"></i>
                 Total de Vagas Livres por Unidade
             </h3>
             <p class="text-sm text-gray-600">Quantidade total de vagas livres disponíveis em cada unidade de saúde</p>
