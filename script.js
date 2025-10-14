@@ -441,7 +441,7 @@ function updateDashboard() {
     updateSummaryTables();
 }
 
-// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - SEM ÍCONES, nome maior e em negrito
+// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Cards com fundo AZUL CLARINHO
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -466,16 +466,16 @@ function updateVagasUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards SEM ÍCONES, com nome maior e em negrito
+    // Gerar HTML dos cards com FUNDO AZUL CLARINHO
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
         
         return `
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
+            <div class="bg-light-blue-card rounded-lg shadow-md p-6 border-l-4 border-l-blue-400 hover:shadow-lg transition-shadow duration-200">
                 <div class="text-center">
                     <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
-                    <p class="text-3xl font-bold text-gray-900 mb-1">${total.toLocaleString()}</p>
-                    <p class="text-sm text-gray-500">vagas agendadas</p>
+                    <p class="text-3xl font-bold text-blue-700 mb-1">${total.toLocaleString()}</p>
+                    <p class="text-sm text-gray-600">vagas agendadas</p>
                 </div>
             </div>
         `;
@@ -484,7 +484,7 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - SEM ÍCONES, nome maior e em negrito
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Cards com fundo VERMELHO CLARINHO
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
@@ -509,16 +509,16 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards SEM ÍCONES, com nome maior e em negrito
+    // Gerar HTML dos cards com FUNDO VERMELHO CLARINHO
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
         
         return `
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
+            <div class="bg-light-red-card rounded-lg shadow-md p-6 border-l-4 border-l-red-400 hover:shadow-lg transition-shadow duration-200">
                 <div class="text-center">
                     <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
-                    <p class="text-3xl font-bold text-gray-900 mb-1">${total.toLocaleString()}</p>
-                    <p class="text-sm text-gray-500">vagas livres</p>
+                    <p class="text-3xl font-bold text-red-700 mb-1">${total.toLocaleString()}</p>
+                    <p class="text-sm text-gray-600">vagas livres</p>
                 </div>
             </div>
         `;
