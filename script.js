@@ -40,32 +40,6 @@ const CORES_VAGAS_LIVRES = [
     'bg-violet-500', 'bg-rose-500', 'bg-sky-500', 'bg-green-600', 'bg-blue-600'
 ];
 
-// Mapeamento de ícones específicos para cada unidade com mais variedade
-const ICONES_UNIDADES = {
-    'Agua Branca': 'fas fa-hospital',
-    'Jardim Bandeirantes': 'fas fa-clinic-medical',
-    'Unidade XV': 'fas fa-hospital-alt',
-    'Csu Eldorado': 'fas fa-hospital-user',
-    'Novo Eldorado': 'fas fa-house-medical',
-    'Jardim Eldorado': 'fas fa-hospital',
-    'Santa Cruz': 'fas fa-briefcase-medical',
-    'Perobas': 'fas fa-hospital',
-    'Parque São João': 'fas fa-hospital-symbol'
-};
-
-// Cores específicas para cada unidade (opcional)
-const CORES_UNIDADES = {
-    'Agua Branca': 'bg-blue-500',
-    'Jardim Bandeirantes': 'bg-green-500',
-    'Unidade XV': 'bg-purple-500',
-    'Csu Eldorado': 'bg-red-500',
-    'Novo Eldorado': 'bg-orange-500',
-    'Jardim Eldorado': 'bg-blue-500',
-    'Santa Cruz': 'bg-pink-500',
-    'Perobas': 'bg-teal-500',
-    'Parque São João': 'bg-indigo-500'
-};
-
 // FUNÇÃO CENTRAL: Verificar se um paciente está agendado baseado na coluna F
 function isPacienteAgendado(nomePaciente) {
     if (!nomePaciente || typeof nomePaciente !== 'string') {
@@ -460,14 +434,14 @@ function updateStats() {
 Chart.register(ChartDataLabels);
 
 function updateDashboard() {
-    updateVagasUnidadeCards(); // Função existente
-    updateVagasLivresUnidadeCards(); // NOVA FUNÇÃO
+    updateVagasUnidadeCards();
+    updateVagasLivresUnidadeCards();
     updateCharts();
     updateTable();
     updateSummaryTables();
 }
 
-// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - Perobas e Parque São João usam ícone de calendário
+// FUNÇÃO MODIFICADA: updateVagasUnidadeCards - SEM ÍCONES, nome maior e em negrito
 function updateVagasUnidadeCards() {
     const container = document.getElementById('vagasUnidadeContainer');
     if (!container) return;
@@ -492,30 +466,16 @@ function updateVagasUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com ícones modificados conforme solicitação
+    // Gerar HTML dos cards SEM ÍCONES, com nome maior e em negrito
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasPorUnidade[unidade] || 0;
-        const cor = CORES_UNIDADES[index % CORES_UNIDADES.length];
-        
-        // MODIFICAÇÃO: Perobas e Parque São João usam ícone de calendário (que estava nas vagas livres)
-        let icone;
-        if (unidade === 'Perobas' || unidade === 'Parque São João') {
-            icone = 'fas fa-calendar-plus'; // Ícone que estava nas vagas livres
-        } else {
-            icone = ICONES_UNIDADES[unidade] || 'fas fa-hospital'; // Ícones originais para outras unidades
-        }
         
         return `
-            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
-                <div class="flex items-center">
-                    <div class="stats-icon ${cor}">
-                        <i class="${icone} text-white"></i>
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
-                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
-                        <p class="text-xs text-gray-500">vagas agendadas</p>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-teal-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="text-center">
+                    <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
+                    <p class="text-3xl font-bold text-gray-900 mb-1">${total.toLocaleString()}</p>
+                    <p class="text-sm text-gray-500">vagas agendadas</p>
                 </div>
             </div>
         `;
@@ -524,7 +484,7 @@ function updateVagasUnidadeCards() {
     container.innerHTML = cardsHTML;
 }
 
-// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - Usar ícones específicos das outras unidades
+// FUNÇÃO MODIFICADA: updateVagasLivresUnidadeCards - SEM ÍCONES, nome maior e em negrito
 function updateVagasLivresUnidadeCards() {
     const container = document.getElementById('vagasLivresUnidadeContainer');
     if (!container) return;
@@ -549,32 +509,16 @@ function updateVagasLivresUnidadeCards() {
         }
     });
 
-    // Gerar HTML dos cards com ícones modificados conforme solicitação
+    // Gerar HTML dos cards SEM ÍCONES, com nome maior e em negrito
     const cardsHTML = UNIDADES_SAUDE.map((unidade, index) => {
         const total = vagasLivresPorUnidade[unidade] || 0;
-        const cor = CORES_VAGAS_LIVRES[index % CORES_VAGAS_LIVRES.length];
-        
-        // MODIFICAÇÃO: Usar ícones específicos que estavam nas vagas agendadas
-        let icone;
-        if (unidade === 'Perobas') {
-            icone = 'fas fa-tree'; // Ícone específico do Perobas que estava nas vagas agendadas
-        } else if (unidade === 'Parque São João') {
-            icone = 'fas fa-leaf'; // Ícone específico do Parque São João que estava nas vagas agendadas
-        } else {
-            icone = 'fas fa-hospital'; // Ícones das outras unidades que estavam nas vagas agendadas
-        }
         
         return `
-            <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
-                <div class="flex items-center">
-                    <div class="stats-icon ${cor}">
-                        <i class="${icone} text-white"></i>
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <p class="text-sm font-medium text-gray-600 truncate" title="${unidade}">${unidade}</p>
-                        <p class="text-2xl font-bold text-gray-900">${total.toLocaleString()}</p>
-                        <p class="text-xs text-gray-500">vagas livres</p>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-emerald-500 hover:shadow-lg transition-shadow duration-200">
+                <div class="text-center">
+                    <p class="text-lg font-bold text-gray-800 mb-3">${unidade}</p>
+                    <p class="text-3xl font-bold text-gray-900 mb-1">${total.toLocaleString()}</p>
+                    <p class="text-sm text-gray-500">vagas livres</p>
                 </div>
             </div>
         `;
@@ -586,9 +530,9 @@ function updateVagasLivresUnidadeCards() {
 function updateCharts() {
     updateChartProximosAgendamentosUnidade();
     updateChartProximosAgendamentosLaboratorio();
-    updateChartPacientesAgendadosLab(); // NOVO GRÁFICO
-    updateChartVagasLivresLab(); // NOVO GRÁFICO
-    updateChartVagasConcedidasTempo(); // GRÁFICO CORRIGIDO - Total de vagas por mês
+    updateChartPacientesAgendadosLab();
+    updateChartVagasLivresLab();
+    updateChartVagasConcedidasTempo();
 }
 
 // FUNÇÃO ATUALIZADA: updateChartProximosAgendamentosUnidade - usando função central para verificar coluna F
@@ -1248,5 +1192,3 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     setInterval(loadData, 600000); // Auto-atualização a cada 10 minutos
 });
-
-
