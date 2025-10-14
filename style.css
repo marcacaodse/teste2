@@ -300,6 +300,41 @@ body {
     margin-left: 8px;
 }
 
+/* ========================================
+   CORES DOS CARDS - VAGAS AGENDADAS E LIVRES
+   ======================================== */
+
+/* Cards com fundo AZUL CLARINHO - Vagas Agendadas */
+.bg-light-blue-card {
+    background: linear-gradient(135deg, #EBF5FF 0%, #D6EBFF 100%) !important;
+    border: 1px solid #B8DAFF;
+}
+
+.bg-light-blue-card:hover {
+    background: linear-gradient(135deg, #D6EBFF 0%, #C2E0FF 100%) !important;
+    transform: translateY(-2px);
+}
+
+/* Cards com fundo VERMELHO CLARINHO - Vagas Livres */
+.bg-light-red-card {
+    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%) !important;
+    border: 1px solid #FFBDBD;
+}
+
+.bg-light-red-card:hover {
+    background: linear-gradient(135deg, #FFD6D6 0%, #FFC4C4 100%) !important;
+    transform: translateY(-2px);
+}
+
+/* Ajustes para garantir legibilidade do texto */
+.bg-light-blue-card .text-blue-700 {
+    color: #1e40af !important;
+}
+
+.bg-light-red-card .text-red-700 {
+    color: #b91c1c !important;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .chart-container {
@@ -333,6 +368,12 @@ body {
     .mes-ano-label {
         font-size: 14px !important;
     }
+    
+    /* Responsividade para cards coloridos */
+    .bg-light-blue-card,
+    .bg-light-red-card {
+        padding: 16px !important;
+    }
 }
 
 @media print {
@@ -361,6 +402,19 @@ body {
     /* Ocultar exibições de filtros na impressão */
     .selected-filters-display {
         display: none !important;
+    }
+    
+    /* Print - manter cores dos cards ao imprimir */
+    .bg-light-blue-card {
+        background: #EBF5FF !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .bg-light-red-card {
+        background: #FFE8E8 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
     }
 }
 
